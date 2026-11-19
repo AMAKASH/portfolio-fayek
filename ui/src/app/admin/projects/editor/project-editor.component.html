@@ -102,7 +102,7 @@
               <span class="field__label">Involvement <span class="hint">Any number of items; drag to reorder</span></span>
               <div class="chips" cdkDropList cdkDropListOrientation="horizontal" (cdkDropListDropped)="dropInvolvement($event)">
                 @for (c of involvement.controls; track c; let i = $index) {
-                  <span class="chip" cdkDrag>
+                  <span class="chip" cdkDrag cdkDragPreviewContainer="parent">
                     <input class="chip__input" [formControl]="c" [style.width.ch]="(c.value.length || 4) + 1" aria-label="Involvement item" />
                     <button type="button" class="chip__x" (click)="removeInvolvement(i)" aria-label="Remove"><app-icon name="x" [size]="12" /></button>
                   </span>
@@ -142,7 +142,7 @@
 
           <div class="blocks" cdkDropList (cdkDropListDropped)="dropBlock($event)">
             @for (b of blocks.controls; track b; let i = $index; let first = $first; let last = $last) {
-              <div class="block card" cdkDrag [class.is-invalid]="b.invalid && b.touched">
+              <div class="block card" cdkDrag cdkDragPreviewContainer="parent" [class.is-invalid]="b.invalid && b.touched">
                 <div class="block__head">
                   <span class="drag-handle" cdkDragHandle title="Drag to reorder"><app-icon name="grip" /></span>
                   <button type="button" class="block__title" (click)="toggleCollapse(b)">

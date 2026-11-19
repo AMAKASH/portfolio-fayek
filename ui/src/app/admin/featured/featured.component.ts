@@ -26,7 +26,7 @@ import { IconComponent } from '../shared/icon.component';
       } @else {
         <div class="card list" cdkDropList (cdkDropListDropped)="drop($event)">
           @for (p of featured(); track p.id; let i = $index; let first = $first; let last = $last) {
-            <div class="tile" cdkDrag>
+            <div class="tile" cdkDrag cdkDragPreviewContainer="parent">
               <span class="drag-handle" cdkDragHandle><app-icon name="grip" /></span>
               <span class="badge">{{ i + 1 }}</span>
               @if (p.featuredImage) { <img class="img" [src]="p.featuredImage" alt="" /> } @else { <span class="img"></span> }

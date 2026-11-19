@@ -54,9 +54,11 @@
           padding-left: 10px;
           }
           img{
+            // Wordmark (313x56): keep its aspect ratio
             height: 14px;
-          width: 54px;
-            object-fit: cover;
+            width: auto;
+            max-width: 120px;
+            object-fit: contain;
           }
         }
 

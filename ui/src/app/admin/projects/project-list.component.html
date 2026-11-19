@@ -41,7 +41,7 @@
   } @else {
     <div class="list card" cdkDropList [cdkDropListData]="items()" [cdkDropListDisabled]="!canReorder()" (cdkDropListDropped)="drop($event)">
       @for (p of items(); track p.id; let i = $index; let first = $first; let last = $last) {
-        <div class="item" cdkDrag [cdkDragData]="p" [class.is-busy]="busyId() === p.id">
+        <div class="item" cdkDrag cdkDragPreviewContainer="parent" [cdkDragData]="p" [class.is-busy]="busyId() === p.id">
           <span class="drag-handle" cdkDragHandle [class.is-hidden]="!canReorder()" title="Drag to reorder"><app-icon name="grip" /></span>
           <span class="pos small muted">{{ i + 1 }}</span>
 
