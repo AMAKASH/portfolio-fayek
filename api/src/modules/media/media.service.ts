@@ -6,6 +6,7 @@ import { HttpError } from '../../lib/http-error.js';
 import { bucket, getS3, publicUrlForKey } from '../../lib/s3.js';
 import { slugify } from '../../lib/slugify.js';
 import { countUrlReferences } from '../projects/project.service.js';
+import { countUrlReferences as countSettingsReferences } from '../settings/settings.service.js';
 import { MediaModel } from './media.model.js';
 import { kindOf } from './media.schema.js';
 
@@ -154,10 +155,12 @@ export async function updateAlt(id: string, alt: string) {
 export async function remove(id: string): Promise<void> {
   const doc = await MediaModel.findById(id).lean();
   if (!doc) throw HttpError.notFound('Media not found');
-  const refs = await countUrlReferences(doc.url);
-  if (refs > 0) {
-    throw HttpError.conflict(`In use by ${refs} project(s). Remove it from those projects first.`, 'MEDIA_IN_USE', {
+  const [refs, settingsRefs] = await Promise.all([countUrlReferences(doc.url), countSettingsReferences(doc.url)]);
+  if (refs > 0 || settingsRefs > 0) {
+    const where = [refs ? `${refs} project(s)` : '', settingsRefs ? 'the home page hero' : ''].filter(Boolean).join(' and ');
+    throw HttpError.conflict(`In use by ${where}. Remove it there first.`, 'MEDIA_IN_USE', {
       projects: refs,
+      settings: settingsRefs,
     });
   }
   await getS3().send(new DeleteObjectCommand({ Bucket: bucket(), Key: doc.key }));

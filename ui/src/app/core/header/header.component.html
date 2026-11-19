@@ -3,7 +3,7 @@
       <div class="grow" [ngClass]="{'active':footerShow}">
          <div class="titlePart">
            <div class="logo">
-            <a href="/home"> <img src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/WarcLogo.png?updatedAt=1725350336140" alt=""></a>
+            <a routerLink="/"> <img src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/WarcLogo.png?updatedAt=1725350336140" alt=""></a>
            </div> 
 
            
@@ -59,7 +59,7 @@
                 [class.active]="activeIndex === i" 
                 (click)="setActive(i)">
               <span >
-                <a [routerLink]="['/']" fragment="footer"  *ngIf="item=='Contact'">{{ item }}</a>
+                <a href="#" (click)="openContact($event)" *ngIf="item=='Contact'">{{ item }}</a>
                 <a [routerLink]="paths[i]" *ngIf="item!='Contact'">{{ item }}</a>
               </span>
             </li>
@@ -93,44 +93,6 @@
                 <a href="https://www.google.com/maps/place/Warc+Limited/@23.7888658,90.4020894,21z/data=!4m17!1m10!3m9!1s0xf3018c648faf3f5:0x456ba708cc5208b8!2sWarc+Limited!8m2!3d23.788877!4d90.4022987!10e5!14m1!1BCgIgAQ!16s%2Fg%2F11v0lmj_35!3m5!1s0xf3018c648faf3f5:0x456ba708cc5208b8!8m2!3d23.788877!4d90.4022987!16s%2Fg%2F11v0lmj_35?entry=ttu&g_ep=EgoyMDI0MDkxNS4wIKXMDSoASAFQAw%3D%3D" target="_blank"><button class="btn2" (mouseover)="isHovered = 4" (mouseleave)="isHovered = -1"><img *ngIf="isHovered!=4" src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/socials/location.png?updatedAt=1725351159574" alt=""><img *ngIf="isHovered==4" src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/socials/hoveredLocation.png?updatedAt=1725352918117" alt="Hover Image" /></button></a>
               </div>
               
-            </div>
-            <div class="companyLogos">
-              <div class="marquee">
-                <div class="marquee-content">
-                  <div id="Web" class="nav-ticker"><img src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/CompanyMarquee/Newimg1.png?updatedAt=1725350653282" alt="">
-                  </div>
-                  <div id="UI" class="nav-ticker"><img src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/CompanyMarquee/Newimg2.png?updatedAt=1725350653305" alt="">
-                  </div>
-                  <div id="SaaS" class="nav-ticker"><img src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/CompanyMarquee/Newimg3.png?updatedAt=1725350653341" alt="">
-                  </div>
-                  <div id="ERP" class="nav-ticker"><img src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/CompanyMarquee/Newimg4.png?updatedAt=1725350653302" alt="">
-                  </div>
-                  <div id="AR/VR" class="nav-ticker"><img src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/CompanyMarquee/Newimg1.png?updatedAt=1725350653282" alt="">
-                  </div>
-                  <div id="App" class="nav-ticker"><img src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/CompanyMarquee/Newimg2.png?updatedAt=1725350653305" alt="">
-                  </div>
-                  <div id="Robotics" class="nav-ticker"><img src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/CompanyMarquee/Newimg3.png?updatedAt=1725350653341" alt="">
-                  </div>
-                  
-              </div>
-              <div class="marquee-content">
-                <div id="Web" class="nav-ticker"><img src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/CompanyMarquee/Newimg1.png?updatedAt=1725350653282" alt="">
-                </div>
-                <div id="UI" class="nav-ticker"><img src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/CompanyMarquee/Newimg2.png?updatedAt=1725350653305" alt="">
-                </div>
-                <div id="SaaS" class="nav-ticker"><img src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/CompanyMarquee/Newimg3.png?updatedAt=1725350653341" alt="">
-                </div>
-                <div id="ERP" class="nav-ticker"><img src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/CompanyMarquee/Newimg4.png?updatedAt=1725350653302" alt="">
-                </div>
-                <div id="AR/VR" class="nav-ticker"><img src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/CompanyMarquee/Newimg1.png?updatedAt=1725350653282" alt="">
-                </div>
-                <div id="App" class="nav-ticker"><img src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/CompanyMarquee/Newimg2.png?updatedAt=1725350653305" alt="">
-                </div>
-                <div id="Robotics" class="nav-ticker"><img src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/CompanyMarquee/Newimg3.png?updatedAt=1725350653341" alt="">
-                </div>
-                
-            </div>
-              </div>
             </div>
           </div>
          </div>

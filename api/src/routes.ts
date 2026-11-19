@@ -4,6 +4,7 @@ import { requireAuth } from './middleware/require-auth.js';
 import { authRoutes } from './modules/auth/auth.routes.js';
 import { adminMediaRoutes } from './modules/media/media.routes.js';
 import { adminProjectRoutes, publicProjectRoutes } from './modules/projects/project.routes.js';
+import { adminSettingsRoutes, publicSettingsRoutes } from './modules/settings/settings.routes.js';
 
 /**
  * API v1. To add a module: create src/modules/<name>/{model,schema,service,controller,routes}.ts
@@ -13,9 +14,11 @@ export const v1 = Router();
 
 v1.use('/auth', noStore, authRoutes);
 v1.use('/projects', publicProjectRoutes);
+v1.use('/settings', publicSettingsRoutes);
 
 const admin = Router();
 admin.use(noStore, requireAuth);
 admin.use('/projects', adminProjectRoutes);
 admin.use('/media', adminMediaRoutes);
+admin.use('/settings', adminSettingsRoutes);
 v1.use('/admin', admin);

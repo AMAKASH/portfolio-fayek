@@ -149,6 +149,22 @@ export interface Paginated<T> {
   limit: number;
 }
 
+/** Site-wide editable content (api/src/modules/settings). */
+export interface HomeHero {
+  image: string;
+  /** Optional portrait crop shown on phones */
+  mobileImage: string;
+  /** Optional: plays instead of the image when set */
+  video: string;
+  poster: string;
+  alt: string;
+}
+
+export interface SiteSettings {
+  homeHero: HomeHero;
+  updatedAt: string | null;
+}
+
 export interface ApiErrorBody {
   error: { message: string; code?: string; details?: unknown };
 }

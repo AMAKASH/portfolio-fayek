@@ -1,8 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { RouterModule } from '@angular/router'; 
+import { Router, RouterModule } from '@angular/router';
 import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, ViewChild } from '@angular/core';
-import Swiper from 'swiper';
 import { ObserverService } from '../../services/observer.service';
 
 @Component({
@@ -18,7 +16,7 @@ export class HeaderComponent {
 
 footerShow =false;
 
-constructor(private observerService:ObserverService){
+constructor(private observerService:ObserverService, private router: Router){
 
 }
 
@@ -34,11 +32,22 @@ ngAfterViewInit(){
 
 isHovered = -1;
 
-items = ['Home', 'About', 'Work', 'Contact'];
-paths = ['/home', '/about', '/works', 'contactSection'];
+// "About" is hidden for now (route removed in app.routes.ts; TeamPageComponent kept for later).
+items = ['Home', 'Work', 'Contact'];
+paths = ['/', '/works', ''];
 activeIndex: number | null = null;
 
 setActive(index: number): void {
   this.activeIndex = index;
+}
+
+/** "Contact" expands the header's contact panel (on the home page, after navigating there if needed). */
+openContact(event: Event): void {
+  event.preventDefault();
+  if (this.router.url.split(/[?#]/)[0] === '/') {
+    this.observerService.footerObserver.next(true);
+  } else {
+    this.router.navigateByUrl('/').then(() => setTimeout(() => this.observerService.footerObserver.next(true)));
+  }
 }
 }

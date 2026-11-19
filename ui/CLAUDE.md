@@ -47,12 +47,13 @@ Angular 17 portfolio site: standalone components, SSR via `@angular/ssr` with an
 |---|---|---|
 | `admin/**` | lazy `admin/admin.routes.ts` | Outside the public layout. See Admin below. |
 | `''` | HomeComponent → `<app-landingpage>` | Tiles from `GET /projects/featured` |
-| `about` | TeamPageComponent | Static |
 | `works` | AllProjectsComponent | Grid from `GET /projects` |
 | `works/:slug` | ProjectDetailsComponent | `projectResolver` loads the data before render. Numeric `:slug` (old `/works/:idx` links) redirects to the slug; unknown slugs go to `/works`. Sets title and meta from `seo`. |
 | `**` | redirect to `''` | |
 
-Public routes are lazy children of `PagesComponent` (`<app-header>` + outlet). The header links to `/home`, which falls through `**` to `''`.
+Public routes are lazy children of `PagesComponent` (`<app-header>` + outlet).
+
+**About is hidden:** its route is removed, so `/about` falls through `**` to home, and it is gone from the header nav. `TeamPageComponent` is kept; to restore it, re-add the route in `app.routes.ts` and put `About` back in the header's `items`/`paths`.
 
 ## Where to edit what
 - **Project content** (titles, client, involvement, results, media, block order, landing tiles, SEO): **use the admin panel**, not code.
@@ -65,17 +66,20 @@ Public routes are lazy children of `PagesComponent` (`<app-header>` + outlet). T
     - `text`: `.textBlock`
   - Below-the-fold videos use [AutoplayInViewDirective](src/app/shared/autoplay-in-view.directive.ts), which plays them only while visible. Images are `loading="lazy"`.
 - **Details page chrome** (contact CTA, previous/next preview): [pages/project-details/](src/app/pages/project-details/). Prev/next comes from the API, ordered by the admin order, and wraps around.
-- **Header / nav / contact panel / social buttons / marquees**: [core/header/](src/app/core/header/).
-  - Nav labels and paths are the `items` and `paths` arrays in `header.component.ts`.
+- **Header / nav / contact panel / social buttons / service marquee**: [core/header/](src/app/core/header/).
+  - Nav labels and paths are the `items` and `paths` arrays in `header.component.ts`: Home, Work, Contact.
+  - "Contact" calls `openContact()`, which expands the panel (navigating home first if needed).
+  - The client-logo strip was removed from the panel; the expanded height (`.grow.active`) is 350px.
   - Social `href`s are empty.
 - **Landing page**: [landingpage.component.html](src/app/pages/home/landingpage/landingpage.component.html).
   - The hero image is hard-coded.
   - The tiles loop over the featured projects; a tile links only when `hasDetails`.
   - The "All Projects" button links to `/works`.
+  - The old bottom brand section (`#footer`) was removed.
 - **About/Team page**: [team-page.component.html](src/app/pages/team-page/team-page.component.html), still hard-coded.
   - Each member is a `<swiper-slide>` preceded by a `<!-- Name -->` comment.
   - Photos are in `src/assets/images/TeamsPage/teamMembers/`.
-- **Page title / favicon**: [src/index.html](src/index.html) (title "WARC LTD."), `src/favicon.ico`.
+- **Page title / favicon**: [src/index.html](src/index.html) (title "Fayek Al Rafi"; keep in sync with `environment.siteTitle`), `src/favicon.ico`.
 
 ## Admin panel (`src/app/admin/`)
 **How it loads:**
@@ -116,7 +120,10 @@ Public routes are lazy children of `PagesComponent` (`<app-header>` + outlet). T
 - PrimeNG is installed but unused.
 
 ## Cross-cutting behavior
-- `ObserverService.footerObserver`: the landing and team pages observe `#footer` and the header expands into the contact panel.
+- `ObserverService.footerObserver` drives the header's contact panel (`.grow.active`).
+  - On the home page, [landingpage.component.ts](src/app/pages/home/landingpage/landingpage.component.ts) expands it when the user keeps scrolling down at the end of the page (wheel, swipe, or ArrowDown/PageDown/Space/End).
+  - Scrolling up, or leaving the bottom, collapses it.
+  - Listeners run outside the zone and are removed on destroy.
 - Swiper is used as web components registered in `src/main.ts`, with `CUSTOM_ELEMENTS_SCHEMA`. They are `init="false"` and initialized manually.
 - **SSR:**
   - Guard browser-only APIs with `typeof document !== 'undefined'`, `afterNextRender` or `isPlatformBrowser`.

@@ -11,7 +11,7 @@ import { apiErrorMessage } from '../../core/api/api-error';
   template: `
     <div class="wrap">
       <form class="card login" [formGroup]="form" (ngSubmit)="submit()">
-        <div class="brand"><span class="mark">W</span><h1>Sign in</h1></div>
+        <div class="brand"><span class="mark">F</span><h1>Sign in</h1></div>
         @if (expired) {
           <div class="banner banner--warn">Your session expired. Please sign in again.</div>
         }

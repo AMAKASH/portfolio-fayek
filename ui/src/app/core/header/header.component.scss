@@ -286,58 +286,6 @@
           }
 
 
-          .companyLogos{
-            // border: 2px solid red;
-            overflow: hidden;
-            margin: auto;
-            margin-top: 2rem;
-            max-width: 437px;
-              width: 100%;
-            .marquee-container {
-              
-              max-width: 374px;
-              width: 100%;
-              overflow: hidden;
-              height: 44px;
-              background-color: rgb(var(--light-n-0));
-            }
-            
-            .marquee {
-              // border: 2px solid rgb(104, 231, 7);
-              white-space: nowrap;
-              overflow: hidden;
-              display: inline-block;
-              animation: marquee 15s linear infinite;
-            }
-            
-            .marquee-content {
-              // border: 2px solid rgb(104, 231, 7);
-              display: inline-block;
-            }
-            .nav-ticker {
-                box-sizing: border-box;
-                padding: 20px 20px;
-                // font-weight: bold;
-                font-family: NeueItalic;
-                
-                white-space: nowrap;
-                
-                opacity: 1;
-                box-sizing: border-box;
-                display: inline-block;
-                // background-color: rgb(var(--light-n-0));
-
-                img{
-                  object-fit: cover;
-                  // border: 2px solid rgb(22, 7, 231);
-                  width: 20px;
-                  scale: 1.3;
-                  // height: 36.367px;
-                  flex-shrink: 0;
-                }
-            }
-
-          }
         }
       }
 
@@ -348,7 +296,7 @@
     // }
 
     .grow.active{
-      height: 443px;
+      height: 350px; // was 443px incl. the removed client-logo strip
     }
   }
 }

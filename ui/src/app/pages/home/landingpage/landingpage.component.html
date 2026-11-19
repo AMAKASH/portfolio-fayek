@@ -6,9 +6,21 @@
             <div class="fullcontainer">
 
                <div class="HeroSection">
+                  <!-- Hero: managed in /admin/home (API: GET /api/v1/settings) -->
                   <div class="image">
-                     <img src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/images/LandingPage/heroImage.png?updatedAt=1725444739430" alt="WARC" fetchpriority="high">
-                      <!-- <video muted autoplay loop src="../../../../assets/images/LandingPage/herovideo2.mp4"></video> -->
+                     @if (hero(); as hero) {
+                        @if (hero.video) {
+                           <video [src]="hero.video" [attr.poster]="hero.poster || hero.image || null" [attr.aria-label]="hero.alt || null"
+                                  muted autoplay loop playsinline preload="auto"></video>
+                        } @else {
+                           <picture>
+                              @if (hero.mobileImage) {
+                                 <source media="(max-width: 500px)" [attr.srcset]="hero.mobileImage">
+                              }
+                              <img [src]="hero.image" [alt]="hero.alt" fetchpriority="high" decoding="async">
+                           </picture>
+                        }
+                     }
                   </div>
                  <div class="text">
                   <button class="btn" routerLink="/works">
@@ -39,12 +51,4 @@
                }
             </div>
       </div>
-</section>
-
-<section class="footer" id="footer" #footer>
-   <div class="brand">
-      <div class="svg">
-          <img src="../../../assets/images/TeamsPage/brand.svg" alt="">
-      </div>
-    </div>
 </section>

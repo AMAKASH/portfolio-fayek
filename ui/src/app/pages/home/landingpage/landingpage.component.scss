@@ -12,6 +12,10 @@
       gap: 0.5rem;
 
       .HeroSection {
+        // Dynamic hero renders <picture><source><img> (optional mobile crop)
+        picture {
+          display: block;
+        }
         margin: 0;
         padding: 0;
         width: 100%;
@@ -177,22 +181,6 @@
             backdrop-filter: blur(41.04999923706055px);
           }
         }
-      }
-    }
-  }
-}
-
-.footer {
-  .brand {
-    .svg {
-      padding-top: 512px;
-      object-fit: cover;
-      
-      
-      @media(max-width:500px){
-        padding-top: 116px;
-        width: 100%;
-    
       }
     }
   }

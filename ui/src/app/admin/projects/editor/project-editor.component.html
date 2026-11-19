@@ -247,7 +247,7 @@
             </div>
             <app-media-field [control]="form.controls.seo.controls.ogImage" kind="image" label="Social share image" hint="1200×630; defaults to the hero image" />
             <div class="serp">
-              <div class="serp__title">{{ form.controls.seo.controls.metaTitle.value || form.controls.title.value || 'Project title' }} | WARC LTD.</div>
+              <div class="serp__title">{{ form.controls.seo.controls.metaTitle.value || form.controls.title.value || 'Project title' }} | {{ siteTitle }}</div>
               <div class="serp__url">/works/{{ form.controls.slug.value || 'slug' }}</div>
               <div class="serp__desc">{{ form.controls.seo.controls.metaDescription.value || form.controls.result.value || 'Description…' }}</div>
             </div>

@@ -5,6 +5,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormArray, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged, filter, firstValueFrom, map, startWith, switchMap, catchError, of } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 import { apiErrorCode, apiErrorMessage } from '../../../core/api/api-error';
 import { AdminProject, ProjectStatus } from '../../../core/models/project';
 import { ProjectViewComponent } from '../../../shared/project-view/project-view.component';
@@ -56,6 +57,8 @@ export class ProjectEditorComponent implements OnInit, HasUnsavedChanges {
   private toast = inject(ToastService);
   private destroyRef = inject(DestroyRef);
 
+  /** Public page-title suffix, shown in the SEO preview. */
+  readonly siteTitle = environment.siteTitle;
   readonly form = createProjectForm();
   readonly blocks = this.form.controls.blocks;
   readonly involvement = this.form.controls.involvement;

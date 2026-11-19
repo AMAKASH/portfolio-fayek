@@ -12,5 +12,5 @@ export const environment = {
   /** API origin used by the dev server's SSR pass when API_INTERNAL_URL isn't set. */
   ssrApiOrigin: 'http://localhost:5000',
 
-  siteTitle: 'WARC LTD.',
+  siteTitle: 'Fayek Al Rafi',
 };

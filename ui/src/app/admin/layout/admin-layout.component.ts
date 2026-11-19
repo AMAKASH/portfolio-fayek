@@ -15,13 +15,13 @@ import { IconComponent } from '../shared/icon.component';
         <button class="btn btn--ghost btn--icon" type="button" (click)="navOpen.set(!navOpen())" aria-label="Toggle navigation">
           <app-icon name="menu" [size]="20" />
         </button>
-        <strong>WARC Admin</strong>
+        <strong>Fayek Al Rafi</strong>
       </header>
 
       <aside class="sidebar">
         <div class="brand">
-          <span class="brand__mark">W</span>
-          <span>WARC Admin</span>
+          <span class="brand__mark">F</span>
+          <span>Fayek Al Rafi</span>
         </div>
         <nav>
           @for (item of nav; track item.path) {
@@ -173,6 +173,7 @@ export class AdminLayoutComponent {
   readonly navOpen = signal(false);
   readonly nav = [
     { path: '/admin/projects', label: 'Projects', icon: 'folder' },
+    { path: '/admin/home', label: 'Home page', icon: 'image' },
     { path: '/admin/featured', label: 'Landing tiles', icon: 'star' },
     { path: '/admin/media', label: 'Media library', icon: 'library' },
     { path: '/admin/account', label: 'Account', icon: 'user' },

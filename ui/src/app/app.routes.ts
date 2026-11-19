@@ -15,10 +15,9 @@ export const routes: Routes = [
         path: '',
         loadComponent: () => import('./pages/home/home.component').then((c) => c.HomeComponent),
       },
-      {
-        path: 'about',
-        loadComponent: () => import('./pages/team-page/team-page.component').then((c) => c.TeamPageComponent),
-      },
+      // About (TeamPageComponent) is hidden for now: /about falls through to '**' → home.
+      // To restore: add { path: 'about', loadComponent: () => import('./pages/team-page/team-page.component').then((c) => c.TeamPageComponent) }
+      // and put 'About' back in the header's items/paths.
       {
         path: 'works',
         loadComponent: () =>

@@ -18,6 +18,6 @@ export const environment = {
   /** Fallback API origin used during server-side rendering when API_INTERNAL_URL isn't set. */
   ssrApiOrigin: 'http://localhost:5000',
 
-  /** Appended to page titles, e.g. "Chillox | WARC LTD." */
-  siteTitle: 'WARC LTD.',
+  /** Appended to page titles, e.g. "Chillox | Fayek Al Rafi" */
+  siteTitle: 'Fayek Al Rafi',
 };

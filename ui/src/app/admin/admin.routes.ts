@@ -40,6 +40,12 @@ export const ADMIN_ROUTES: Routes = [
               import('./projects/editor/project-editor.component').then((c) => c.ProjectEditorComponent),
           },
           {
+            path: 'home',
+            title: 'Home page | Admin',
+            canDeactivate: [unsavedChangesGuard],
+            loadComponent: () => import('./home/home-settings.component').then((c) => c.HomeSettingsComponent),
+          },
+          {
             path: 'featured',
             title: 'Landing tiles | Admin',
             loadComponent: () => import('./featured/featured.component').then((c) => c.FeaturedComponent),
