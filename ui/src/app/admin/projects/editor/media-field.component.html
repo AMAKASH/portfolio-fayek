@@ -1,0 +1,74 @@
+<div class="mf" [class.mf--compact]="compact" [class.is-drag]="dragOver()"
+     (dragover)="onDragOver($event)" (dragleave)="dragOver.set(false)" (drop)="onDrop($event)">
+  @if (label) {
+    <div class="field__label">{{ label }} @if (hint) { <span class="hint">{{ hint }}</span> }</div>
+  }
+
+  <div class="mf__row">
+    <button type="button" class="mf__preview" (click)="browse()" [title]="urlControl.value ? 'Replace file' : 'Upload file'">
+      @if (urlControl.value) {
+        @if (currentKind === 'video') {
+          <video [src]="urlControl.value" muted preload="metadata" playsinline></video>
+          <span class="mf__badge"><app-icon name="video" [size]="12" /></span>
+        } @else {
+          <img [src]="urlControl.value" alt="" loading="lazy" />
+        }
+      } @else {
+        <span class="mf__empty">
+          <app-icon [name]="currentKind === 'video' ? 'video' : 'image'" [size]="20" />
+          <span class="small">Drop or click</span>
+        </span>
+      }
+    </button>
+
+    <div class="mf__body">
+      @if (item) {
+        <div class="seg" role="radiogroup" aria-label="Media type">
+          <button type="button" [class.is-on]="currentKind === 'image'" (click)="setKind('image')"><app-icon name="image" [size]="14" /> Image</button>
+          <button type="button" [class.is-on]="currentKind === 'video'" (click)="setKind('video')"><app-icon name="video" [size]="14" /> Video</button>
+        </div>
+      }
+
+      <input class="input" type="url" [formControl]="urlControl"
+             [placeholder]="currentKind === 'video' ? 'Video URL (mp4/webm) — or upload' : 'Image URL — or upload'" />
+
+      @if (progress() !== null) {
+        <div class="row">
+          <div class="progress" style="flex:1"><span [style.width.%]="progress()"></span></div>
+          <span class="small muted">{{ progress() }}%</span>
+          <button class="btn btn--sm btn--ghost" type="button" (click)="cancel()">Cancel</button>
+        </div>
+      } @else {
+        <div class="row">
+          <button class="btn btn--sm" type="button" (click)="browse()"><app-icon name="upload" [size]="14" /> Upload</button>
+          <button class="btn btn--sm" type="button" (click)="picking.set(true)"><app-icon name="library" [size]="14" /> Library</button>
+          @if (urlControl.value) {
+            <a class="btn btn--sm btn--ghost" [href]="urlControl.value" target="_blank" rel="noopener" title="Open"><app-icon name="external" [size]="14" /></a>
+            <button class="btn btn--sm btn--ghost" type="button" (click)="clear()">Clear</button>
+          }
+        </div>
+      }
+      @if (error()) {
+        <div class="err small">{{ error() }}</div>
+      }
+
+      @if (item && !compact) {
+        <input class="input" type="text" [formControl]="item.controls.alt"
+               [placeholder]="currentKind === 'video' ? 'Accessible description (optional)' : 'Alt text (describe the image)'" />
+      }
+    </div>
+  </div>
+
+  @if (item && currentKind === 'video' && !compact) {
+    <details class="mf__poster" [open]="!!item.controls.poster.value">
+      <summary class="small muted">Poster image (shown before the video loads)</summary>
+      <app-media-field [control]="item.controls.poster" kind="image" [compact]="true" />
+    </details>
+  }
+
+  <input #file type="file" hidden [accept]="accept" (change)="onFileInput($event)" />
+</div>
+
+@if (picking()) {
+  <app-media-picker [lockKind]="item ? null : kind" (picked)="onPicked($event)" (closed)="picking.set(false)" />
+}

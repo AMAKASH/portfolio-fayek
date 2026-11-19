@@ -1,0 +1,50 @@
+<app-header></app-header>
+
+<section class="main" id="main" #main>
+
+      <div class="mainContainer">
+            <div class="fullcontainer">
+
+               <div class="HeroSection">
+                  <div class="image">
+                     <img src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/images/LandingPage/heroImage.png?updatedAt=1725444739430" alt="WARC" fetchpriority="high">
+                      <!-- <video muted autoplay loop src="../../../../assets/images/LandingPage/herovideo2.mp4"></video> -->
+                  </div>
+                 <div class="text">
+                  <button class="btn" routerLink="/works">
+                     All Projects
+                  </button>
+                 </div>
+
+               </div>
+
+               <!-- Featured tiles: managed in /admin/featured (API: GET /api/v1/projects/featured) -->
+               @for (tile of tiles(); track tile.slug; let idx = $index) {
+               <div class="project">
+                  @if (tile.hasDetails) {
+                  <a [routerLink]="['/', 'works', tile.slug]" [attr.aria-label]="tile.title">
+                     <div class="image">
+                        <img [src]="tile.image" [alt]="tile.title" [attr.loading]="idx === 0 ? null : 'lazy'" decoding="async">
+                     </div>
+                  </a>
+                  } @else {
+                  <div class="image">
+                     <img [src]="tile.image" [alt]="tile.title" [attr.loading]="idx === 0 ? null : 'lazy'" decoding="async">
+                  </div>
+                  }
+                 <div class="text">
+                  <h3>{{ tile.title }}</h3>
+                 </div>
+               </div>
+               }
+            </div>
+      </div>
+</section>
+
+<section class="footer" id="footer" #footer>
+   <div class="brand">
+      <div class="svg">
+          <img src="../../../assets/images/TeamsPage/brand.svg" alt="">
+      </div>
+    </div>
+</section>

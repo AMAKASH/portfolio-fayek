@@ -1,0 +1,148 @@
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+  div {
+    background: var(--a-surface);
+    border: 1px solid var(--a-border);
+    border-radius: var(--a-radius);
+    padding: 12px 14px;
+    display: grid;
+  }
+  strong {
+    font-size: 20px;
+  }
+  span {
+    color: var(--a-muted);
+    font-size: 12.5px;
+  }
+  @media (max-width: 700px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.toolbar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.search {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+  app-icon {
+    position: absolute;
+    left: 11px;
+    top: 10px;
+    color: var(--a-muted);
+  }
+  .input {
+    padding-left: 34px;
+  }
+}
+.status {
+  width: 160px;
+}
+.note {
+  margin: 0 0 10px;
+}
+
+.list {
+  padding: 4px;
+}
+.item {
+  display: grid;
+  grid-template-columns: auto 22px minmax(0, 1fr) auto 56px auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px;
+  border-radius: 8px;
+  background: var(--a-surface);
+  & + .item {
+    border-top: 1px solid var(--a-border);
+  }
+  &:hover {
+    background: #fafaf8;
+  }
+  &.is-busy {
+    opacity: 0.6;
+  }
+}
+.drag-handle.is-hidden {
+  visibility: hidden;
+}
+.pos {
+  text-align: right;
+}
+.main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  text-decoration: none;
+  .text {
+    display: grid;
+    min-width: 0;
+  }
+}
+.flags {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.actions {
+  display: flex;
+  gap: 2px;
+  justify-content: flex-end;
+}
+.sm-only {
+  display: none;
+}
+
+@media (max-width: 1000px) {
+  .item {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'h main actions'
+      'h flags flags';
+    row-gap: 6px;
+  }
+  .drag-handle {
+    grid-area: h;
+  }
+  .pos,
+  .updated {
+    display: none;
+  }
+  .main {
+    grid-area: main;
+  }
+  .flags {
+    grid-area: flags;
+    flex-wrap: wrap;
+  }
+  .actions {
+    grid-area: actions;
+  }
+}
+@media (max-width: 600px) {
+  .sm-only {
+    display: inline-flex;
+  }
+  .drag-handle {
+    display: none;
+  }
+  .item {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'main' 'flags' 'actions';
+  }
+  .actions {
+    justify-content: flex-start;
+  }
+  .thumb {
+    width: 52px;
+    height: 38px;
+  }
+}

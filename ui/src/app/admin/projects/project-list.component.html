@@ -1,0 +1,91 @@
+<div class="page">
+  <div class="page__head">
+    <h1>Projects</h1>
+    <a class="btn btn--primary" routerLink="/admin/projects/new"><app-icon name="plus" /> New project</a>
+  </div>
+
+  <div class="stats">
+    <div><strong>{{ counts().total }}</strong><span>total</span></div>
+    <div><strong>{{ counts().published }}</strong><span>published</span></div>
+    <div><strong>{{ counts().inGrid }}</strong><span>in works grid</span></div>
+    <div><strong>{{ counts().featured }}</strong><span>on landing page</span></div>
+  </div>
+
+  <div class="toolbar">
+    <label class="search">
+      <app-icon name="search" />
+      <input class="input" type="search" placeholder="Search title, slug, category…" [ngModel]="search()" (ngModelChange)="search.set($event)" />
+    </label>
+    <select class="select status" [ngModel]="status()" (ngModelChange)="status.set($event)" aria-label="Filter by status">
+      <option value="">All statuses</option>
+      <option value="published">Published</option>
+      <option value="draft">Draft</option>
+    </select>
+  </div>
+
+  @if (!canReorder()) {
+    <p class="small muted note">Clear the search and filter to drag-reorder projects.</p>
+  } @else if (all().length > 1) {
+    <p class="small muted note">Drag rows to set the order of the works grid and of the Previous/Next links.</p>
+  }
+
+  @if (loadError()) {
+    <div class="banner banner--error">{{ loadError() }} <button class="btn btn--sm" (click)="load()">Retry</button></div>
+  } @else if (loading()) {
+    <div class="empty"><span class="adm-spinner"></span></div>
+  } @else if (!items().length) {
+    <div class="card empty">
+      @if (all().length) { No projects match your filters. }
+      @else { No projects yet. <a routerLink="/admin/projects/new">Create the first one</a>. }
+    </div>
+  } @else {
+    <div class="list card" cdkDropList [cdkDropListData]="items()" [cdkDropListDisabled]="!canReorder()" (cdkDropListDropped)="drop($event)">
+      @for (p of items(); track p.id; let i = $index; let first = $first; let last = $last) {
+        <div class="item" cdkDrag [cdkDragData]="p" [class.is-busy]="busyId() === p.id">
+          <span class="drag-handle" cdkDragHandle [class.is-hidden]="!canReorder()" title="Drag to reorder"><app-icon name="grip" /></span>
+          <span class="pos small muted">{{ i + 1 }}</span>
+
+          <a class="main" [routerLink]="['/admin/projects', p.id]">
+            @if (p.thumbnail) {
+              <img class="thumb" [src]="p.thumbnail" alt="" loading="lazy" />
+            } @else {
+              <span class="thumb"></span>
+            }
+            <span class="text">
+              <strong class="truncate">{{ p.title }}</strong>
+              <span class="small muted truncate">/works/{{ p.slug }} · {{ p.blockCount }} block{{ p.blockCount === 1 ? '' : 's' }}</span>
+            </span>
+          </a>
+
+          <div class="flags">
+            <button type="button" class="pill" [class]="'pill pill--' + p.status" (click)="toggle(p, 'status')"
+                    [title]="p.status === 'published' ? 'Click to unpublish' : 'Click to publish'" [disabled]="busyId() === p.id">
+              {{ p.status === 'published' ? 'Published' : 'Draft' }}
+            </button>
+            <label class="switch small" title="Show in the works grid (/works)">
+              <input type="checkbox" [checked]="p.listed" (change)="toggle(p, 'listed')" [disabled]="busyId() === p.id" /> Grid
+            </label>
+            <label class="switch small" title="Show as a tile on the landing page">
+              <input type="checkbox" [checked]="p.featured" (change)="toggle(p, 'featured')" [disabled]="busyId() === p.id" /> Landing
+            </label>
+          </div>
+
+          <span class="updated small muted" [title]="p.updatedAt | date: 'medium'">{{ p.updatedAt | date: 'MMM d' }}</span>
+
+          <div class="actions">
+            @if (canReorder()) {
+              <button class="btn btn--ghost btn--icon sm-only" type="button" (click)="move(p, -1)" [disabled]="first" aria-label="Move up"><app-icon name="up" /></button>
+              <button class="btn btn--ghost btn--icon sm-only" type="button" (click)="move(p, 1)" [disabled]="last" aria-label="Move down"><app-icon name="down" /></button>
+            }
+            @if (p.status === 'published') {
+              <a class="btn btn--ghost btn--icon" [href]="'/works/' + p.slug" target="_blank" rel="noopener" title="View on site"><app-icon name="eye" /></a>
+            }
+            <a class="btn btn--ghost btn--icon" [routerLink]="['/admin/projects', p.id]" title="Edit"><app-icon name="edit" /></a>
+            <button class="btn btn--ghost btn--icon" type="button" (click)="duplicate(p)" title="Duplicate" [disabled]="busyId() === p.id"><app-icon name="copy" /></button>
+            <button class="btn btn--ghost btn--icon btn--danger" type="button" (click)="remove(p)" title="Delete" [disabled]="busyId() === p.id"><app-icon name="trash" /></button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

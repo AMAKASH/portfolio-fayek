@@ -1,0 +1,48 @@
+<app-header></app-header>
+
+@if (project(); as project) {
+  <section class="main">
+    <div class="mainContainer">
+      <div class="fullContainer">
+        <app-project-view [project]="project" />
+
+        <div class="contact">
+          <div class="contactBody">
+            <div class="heading">
+              <h1>Make Contact, Make Impact.</h1>
+            </div>
+            <div class="subtitle">
+              <h3>WITH US IT HAPPENS.</h3>
+              <h3>WE WOULD LOVE TO HEAR FROM YOU.</h3>
+            </div>
+            <div class="button">
+              <button class="btn">Start a project with us</button>
+            </div>
+          </div>
+        </div>
+
+        @if (project.next || project.prev) {
+          <div class="nextProjectPreview">
+            @if (project.next; as next) {
+              @if (next.heroImage) {
+                <div class="projectPreview">
+                  <img [src]="next.heroImage" [alt]="next.title" loading="lazy" decoding="async">
+                </div>
+              }
+            }
+
+            <div class="buttons">
+              @if (project.prev; as prev) {
+                <a [routerLink]="['/', 'works', prev.slug]" [attr.aria-label]="'Previous: ' + prev.title"><button class="btn">Previous</button></a>
+              }
+              <hr>
+              @if (project.next; as next) {
+                <a [routerLink]="['/', 'works', next.slug]" [attr.aria-label]="'Next: ' + next.title"><button class="btn2">Next</button></a>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+}

@@ -1,0 +1,103 @@
+@if (project.hero.video || project.hero.image) {
+  <div class="heroImage">
+    @if (project.hero.video) {
+      @if (heroAutoplay) {
+        <video [src]="project.hero.video" [attr.poster]="project.hero.poster || project.hero.image || null"
+               muted autoplay loop playsinline preload="auto"></video>
+      } @else {
+        <video [src]="project.hero.video" [attr.poster]="project.hero.poster || project.hero.image || null" appAutoplayInView></video>
+      }
+    } @else {
+      <img [src]="project.hero.image" [alt]="project.title" fetchpriority="high" decoding="async">
+    }
+  </div>
+}
+
+<div class="projectInformation">
+  <div class="projectBody">
+    <div class="bodyLeft">
+      @if (project.client) {
+        <div class="client">
+          <h3>Client</h3>
+          <span>{{ project.client }}</span>
+        </div>
+      }
+      @if (project.involvement.length) {
+        <div class="involvement">
+          <h3>Involvement</h3>
+          @for (item of project.involvement; track $index) {
+            <span>{{ item }}</span>
+          }
+        </div>
+      }
+    </div>
+    <hr>
+    <div class="bodyRight">
+      <div class="rightTop">
+        <div class="title">
+          <h1>{{ project.mainTitle || project.title }}</h1>
+        </div>
+        @if (project.subtitle) {
+          <div class="subtitle">
+            <h2>{{ project.subtitle }}</h2>
+          </div>
+        }
+      </div>
+      @if (project.result) {
+        <div class="rightBottom">
+          <h3>Results</h3>
+          <p>{{ project.result }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<ng-template #media let-item>
+  @if (item.kind === 'video') {
+    <video [src]="item.url" [attr.poster]="item.poster || null" [attr.aria-label]="item.alt || null" appAutoplayInView></video>
+  } @else {
+    <img [src]="item.url" [alt]="item.alt || ''" [attr.width]="item.width || null" [attr.height]="item.height || null"
+         loading="lazy" decoding="async">
+  }
+</ng-template>
+
+<!-- Don't use `??` in a track expression: Angular 17 compiles it to an undeclared temp var (ReferenceError at runtime). -->
+@for (block of project.blocks; track block.id || $index) {
+  @switch (block.type) {
+    @case ('media') {
+      @if (block.layout === 'full' && block.items.length) {
+        <div [class]="block.items[0].kind === 'video' ? 'bigVideo' : 'singleImage'">
+          <ng-container *ngTemplateOutlet="media; context: { $implicit: block.items[0] }" />
+        </div>
+      } @else if (block.layout === 'split') {
+        @if (allImages(block.items)) {
+          <div class="doubleImage">
+            @for (item of block.items; track $index) {
+              <ng-container *ngTemplateOutlet="media; context: { $implicit: item }" />
+            }
+          </div>
+        } @else {
+          <div class="doubleVideo">
+            @for (item of block.items; track $index) {
+              <div class="videoChild">
+                <ng-container *ngTemplateOutlet="media; context: { $implicit: item }" />
+              </div>
+            }
+          </div>
+        }
+      }
+      @if (block.caption) {
+        <p class="caption">{{ block.caption }}</p>
+      }
+    }
+    @case ('text') {
+      <div class="textBlock">
+        @if (block.heading) {
+          <h3>{{ block.heading }}</h3>
+        }
+        <p>{{ block.body }}</p>
+      </div>
+    }
+  }
+}

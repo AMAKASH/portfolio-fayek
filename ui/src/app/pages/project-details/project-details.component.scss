@@ -1,0 +1,168 @@
+.main {
+  position: relative;
+  box-sizing: border-box;
+  background: #f3f3f3;
+  .mainContainer {
+    .fullContainer {
+      margin-top: 0.5rem;
+      margin-left: 0.5rem;
+      margin-right: 0.5rem;
+
+      @media (max-width: 1400px) {
+        overflow-x: hidden;
+      }
+      .contact {
+        margin-top: 150px;
+        margin-bottom: 150px;
+        margin-left: 115px;
+
+        @media (max-width: 500px) {
+          margin-top: 5rem;
+          margin-left: 0.3rem;
+          margin-right: 0.3rem;
+          margin-bottom: 5rem;
+        }
+        .contactBody {
+          width: 785px;
+          height: 336px;
+
+          @media (max-width: 500px) {
+            width: 355px;
+            height: 168px;
+          }
+          .heading {
+            h1 {
+              color: #000;
+
+              font-family: NeueMed;
+              font-weight: 700;
+              font-size: 54px;
+              font-style: normal;
+              font-weight: 500;
+              line-height: normal;
+              margin-bottom: 35px;
+
+              @media (max-width: 500px) {
+                color: #000;
+
+                font-size: 24px;
+                font-style: normal;
+                margin-bottom: 16px;
+              }
+            }
+          }
+          .subtitle {
+            h3 {
+              color: #858585;
+
+              font-family: "NeueMed";
+              font-size: 32px;
+              font-style: normal;
+              font-weight: 500;
+
+              @media (max-width: 500px) {
+                color: #858585;
+
+                font-size: 16px;
+                font-style: normal;
+              }
+            }
+          }
+          .button {
+            margin-top: 58px;
+
+            @media (max-width: 500px) {
+              margin-top: 2rem;
+            }
+            .btn {
+              border: none;
+              width: 210px;
+              height: 56px;
+              flex-shrink: 0;
+              border-radius: 56px;
+              color: white;
+              background: #000;
+              font-size: 16px;
+              backdrop-filter: blur(41.04999923706055px);
+
+              @media (max-width: 500px) {
+                width: 176px;
+                height: 42px;
+
+                font-size: 14px;
+              }
+            }
+          }
+        }
+      }
+      .nextProjectPreview {
+        position: relative;
+        .projectPreview {
+          margin: 0;
+          padding: 0;
+          width: 100%;
+          padding-bottom: 0.5rem;
+          img {
+            object-fit: cover;
+            aspect-ratio: 16/9;
+            width: 100%;
+            border-radius: 10px;
+
+            @media (max-width: 500px) {
+              // aspect-ratio: 1/1;
+            }
+          }
+        }
+
+        .buttons {
+          position: absolute;
+          left: 50%;
+          transform: translate(-50%);
+          bottom: 50px;
+          display: flex;
+
+          @media (max-width: 500px) {
+            bottom: 20px;
+          }
+          hr {
+            background-color: #858585;
+            border-color: #8585851c;
+          }
+          .btn {
+            border: none;
+            color: white;
+            width: 240px;
+            height: 47px;
+            font-size: 14px;
+            flex-shrink: 0;
+            border-radius: 5px 0px 0px 5px;
+            background: rgba(0, 0, 0, 0.5);
+
+            backdrop-filter: blur(41.04999923706055px);
+
+            @media (max-width: 500px) {
+              width: 175px;
+              height: 40px;
+            }
+          }
+          .btn2 {
+            border: none;
+            color: white;
+            width: 240px;
+            height: 47px;
+            font-size: 14px;
+            flex-shrink: 0;
+            border-radius: 0px 5px 5px 0px;
+            background: rgba(0, 0, 0, 0.5);
+
+            backdrop-filter: blur(41.04999923706055px);
+            @media (max-width: 500px) {
+              width: 175px;
+              height: 40px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

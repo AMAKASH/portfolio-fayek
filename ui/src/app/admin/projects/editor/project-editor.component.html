@@ -1,0 +1,278 @@
+<div class="editor" [class.editor--nopreview]="!showPreview()">
+  <!-- ============ sticky save bar ============ -->
+  <header class="bar">
+    <a class="btn btn--ghost btn--icon" routerLink="/admin/projects" aria-label="Back to projects"><app-icon name="up" class="rot" /></a>
+    <div class="bar__title">
+      <strong class="truncate">{{ form.controls.title.value || (id() ? 'Untitled' : 'New project') }}</strong>
+      <span class="small muted row">
+        <span class="pill" [class]="'pill pill--' + status()">{{ status() === 'published' ? 'Published' : 'Draft' }}</span>
+        @if (form.dirty) { <span>Unsaved changes</span> }
+        @else if (project()) { <span>Saved {{ project()!.updatedAt | date: 'MMM d, HH:mm' }}</span> }
+      </span>
+    </div>
+    <div class="spacer"></div>
+    <div class="bar__actions">
+      <button type="button" class="btn btn--ghost hide-sm" (click)="showPreview.set(!showPreview())">
+        <app-icon name="eye" /> {{ showPreview() ? 'Hide' : 'Show' }} preview
+      </button>
+      @if (project()?.status === 'published') {
+        <a class="btn btn--ghost btn--icon" [href]="'/works/' + project()!.slug" target="_blank" rel="noopener" title="View live page"><app-icon name="external" /></a>
+      }
+      @if (status() === 'published') {
+        <button type="button" class="btn" (click)="save('draft')" [disabled]="saving()">Unpublish</button>
+        <button type="button" class="btn btn--primary" (click)="save()" [disabled]="saving() || (!form.dirty && !!id())" title="Ctrl/⌘ + S">
+          @if (saving()) { <span class="adm-spinner sm"></span> } Save
+        </button>
+      } @else {
+        <button type="button" class="btn" (click)="save('draft')" [disabled]="saving()" title="Ctrl/⌘ + S">Save draft</button>
+        <button type="button" class="btn btn--primary" (click)="save('published')" [disabled]="saving()">
+          @if (saving()) { <span class="adm-spinner sm"></span> } Publish
+        </button>
+      }
+    </div>
+  </header>
+
+  @if (conflict()) {
+    <div class="banner banner--warn conflict">
+      <strong>This project was changed in another tab or session.</strong>
+      <span class="spacer"></span>
+      <button class="btn btn--sm" type="button" (click)="reloadLatest()">Load latest (discard mine)</button>
+      <button class="btn btn--sm btn--primary" type="button" (click)="save(undefined, true)">Overwrite with mine</button>
+    </div>
+  }
+
+  @if (loadError()) {
+    <div class="page"><div class="banner banner--error">{{ loadError() }} <button class="btn btn--sm" (click)="reloadLatest()">Retry</button></div></div>
+  } @else if (loading()) {
+    <div class="empty"><span class="adm-spinner"></span></div>
+  } @else {
+    <div class="cols">
+      <!-- ============ form ============ -->
+      <form class="formcol" [formGroup]="form" (ngSubmit)="save()" novalidate>
+        <nav class="tabs" role="tablist">
+          @for (t of tabs; track t.id) {
+            <button type="button" role="tab" [attr.aria-selected]="tab() === t.id" [class.is-on]="tab() === t.id" (click)="tab.set(t.id)">
+              {{ t.label }}
+              @if (t.id === 'content') { <span class="count">{{ blocks.length }}</span> }
+              @if (t.id === 'content' && blockErrors()) { <span class="dot" title="Some blocks are incomplete"></span> }
+            </button>
+          }
+        </nav>
+
+        <!-- ---------- DETAILS ---------- -->
+        @if (tab() === 'details') {
+          <section class="card stack">
+            <div class="field">
+              <label for="title">Project title <span class="hint">Shown in the works grid</span></label>
+              <input id="title" class="input" formControlName="title" placeholder="e.g. Chillox" />
+              @if (form.controls.title.touched && form.controls.title.invalid) { <span class="err">Title is required.</span> }
+            </div>
+            <div class="grid-2">
+              <div class="field">
+                <label for="slug">URL slug</label>
+                <div class="prefixed"><span class="muted">/works/</span><input id="slug" class="input" formControlName="slug" (input)="onSlugInput()" placeholder="auto from title" /></div>
+                @if (form.controls.slug.invalid) { <span class="err">Lowercase letters, numbers and single dashes only.</span> }
+                @else if (slugTaken()) { <span class="err">Already used by another project.</span> }
+                @else if (project() && form.controls.slug.value !== project()!.slug) { <span class="hint">Changing the slug breaks existing links to this project.</span> }
+              </div>
+              <div class="field">
+                <label for="description">Category <span class="hint">e.g. (Film Studio)</span></label>
+                <input id="description" class="input" formControlName="description" />
+              </div>
+            </div>
+            <app-media-field [control]="form.controls.thumbnail" kind="image" label="Grid thumbnail" hint="Works grid card image" />
+          </section>
+
+          <section class="card stack">
+            <h2>Case study</h2>
+            <div class="field">
+              <label for="mainTitle">Headline <span class="hint">Large title on the project page (falls back to the project title)</span></label>
+              <input id="mainTitle" class="input" formControlName="mainTitle" />
+            </div>
+            <div class="field">
+              <label for="subtitle">Subtitle</label>
+              <textarea id="subtitle" class="textarea" rows="2" formControlName="subtitle"></textarea>
+            </div>
+            <div class="field">
+              <label for="client">Client</label>
+              <input id="client" class="input" formControlName="client" />
+            </div>
+
+            <div class="field">
+              <span class="field__label">Involvement <span class="hint">Any number of items; drag to reorder</span></span>
+              <div class="chips" cdkDropList cdkDropListOrientation="horizontal" (cdkDropListDropped)="dropInvolvement($event)">
+                @for (c of involvement.controls; track c; let i = $index) {
+                  <span class="chip" cdkDrag>
+                    <input class="chip__input" [formControl]="c" [style.width.ch]="(c.value.length || 4) + 1" aria-label="Involvement item" />
+                    <button type="button" class="chip__x" (click)="removeInvolvement(i)" aria-label="Remove"><app-icon name="x" [size]="12" /></button>
+                  </span>
+                }
+                <input #inv class="input chip-add" placeholder="Add and press Enter" (keydown.enter)="$event.preventDefault(); addInvolvement(inv)" (blur)="addInvolvement(inv)" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="result">Results</label>
+              <textarea id="result" class="textarea" rows="4" formControlName="result"></textarea>
+            </div>
+          </section>
+        }
+
+        <!-- ---------- HERO ---------- -->
+        @if (tab() === 'hero') {
+          <section class="card stack" formGroupName="hero">
+            <p class="small muted">The hero video plays at the top of the project page. If there's no video, the hero image is shown instead. The hero image is also used as the "next project" preview on the neighbouring project.</p>
+            <app-media-field [control]="form.controls.hero.controls.video" kind="video" label="Hero video" />
+            <app-media-field [control]="form.controls.hero.controls.image" kind="image" label="Hero image" hint="Fallback + next-project preview" />
+            <app-media-field [control]="form.controls.hero.controls.poster" kind="image" label="Video poster" hint="Optional: shown while the hero video loads" />
+          </section>
+        }
+
+        <!-- ---------- CONTENT ---------- -->
+        @if (tab() === 'content') {
+          <div class="blocks-head row">
+            <span class="small muted">{{ blocks.length }} block{{ blocks.length === 1 ? '' : 's' }}. Drag to reorder.</span>
+            <span class="spacer"></span>
+            @if (blocks.length > 1) {
+              <button type="button" class="btn btn--sm btn--ghost" (click)="collapseAll(collapsed().size < blocks.length)">
+                {{ collapsed().size < blocks.length ? 'Collapse all' : 'Expand all' }}
+              </button>
+            }
+          </div>
+
+          <div class="blocks" cdkDropList (cdkDropListDropped)="dropBlock($event)">
+            @for (b of blocks.controls; track b; let i = $index; let first = $first; let last = $last) {
+              <div class="block card" cdkDrag [class.is-invalid]="b.invalid && b.touched">
+                <div class="block__head">
+                  <span class="drag-handle" cdkDragHandle title="Drag to reorder"><app-icon name="grip" /></span>
+                  <button type="button" class="block__title" (click)="toggleCollapse(b)">
+                    <span class="badge">{{ i + 1 }}</span>
+                    <app-icon [name]="b.controls.type.value === 'text' ? 'text' : (b.controls.layout.value === 'split' ? 'split' : 'full')" />
+                    <span class="truncate">{{ blockSummary(b) }}</span>
+                  </button>
+                  @if (b.controls.type.value === 'media') {
+                    <div class="seg" role="radiogroup" aria-label="Layout">
+                      <button type="button" [class.is-on]="b.controls.layout.value === 'full'" (click)="setLayout(b, 'full')" title="One item, full width"><app-icon name="full" [size]="14" /></button>
+                      <button type="button" [class.is-on]="b.controls.layout.value === 'split'" (click)="setLayout(b, 'split')" title="Two items side by side"><app-icon name="split" [size]="14" /></button>
+                    </div>
+                  }
+                  <button type="button" class="btn btn--ghost btn--icon" (click)="moveBlock(i, -1)" [disabled]="first" aria-label="Move up"><app-icon name="up" /></button>
+                  <button type="button" class="btn btn--ghost btn--icon" (click)="moveBlock(i, 1)" [disabled]="last" aria-label="Move down"><app-icon name="down" /></button>
+                  <button type="button" class="btn btn--ghost btn--icon" (click)="duplicateBlock(i)" title="Duplicate"><app-icon name="copy" /></button>
+                  <button type="button" class="btn btn--ghost btn--icon btn--danger" (click)="removeBlock(i)" title="Remove"><app-icon name="trash" /></button>
+                </div>
+
+                @if (!collapsed().has(b)) {
+                  <div class="block__body">
+                    @if (b.controls.type.value === 'text') {
+                      <div class="field">
+                        <label>Heading <span class="hint">small grey label, optional</span></label>
+                        <input class="input" [formControl]="b.controls.heading" />
+                      </div>
+                      <div class="field">
+                        <label>Text</label>
+                        <textarea class="textarea" rows="4" [formControl]="b.controls.body"></textarea>
+                        @if (b.controls.body.touched && b.controls.body.invalid) { <span class="err">Text can't be empty.</span> }
+                      </div>
+                    } @else {
+                      <div class="slots" [class.slots--split]="b.controls.layout.value === 'split'">
+                        @for (item of b.controls.items.controls; track item; let j = $index) {
+                          <div class="slot">
+                            @if (b.controls.items.length > 1) { <span class="small muted">{{ j === 0 ? 'Left' : 'Right' }}</span> }
+                            <app-media-field [item]="item" />
+                            @if (item.controls.url.touched && item.controls.url.invalid) { <span class="err small">Add a file or URL.</span> }
+                          </div>
+                        }
+                      </div>
+                      <input class="input" [formControl]="b.controls.caption" placeholder="Caption (optional)" />
+                    }
+                  </div>
+                }
+
+                @if (insertAt() === i) {
+                  <div class="adder">
+                    @for (p of presets; track p.id) {
+                      <button type="button" class="btn btn--sm" (click)="addBlock(p.id, i + 1)"><app-icon [name]="p.icon" [size]="14" /> {{ p.label }}</button>
+                    }
+                    <button type="button" class="btn btn--sm btn--ghost" (click)="insertAt.set(null)">Cancel</button>
+                  </div>
+                } @else if (!last) {
+                  <button type="button" class="insert" (click)="insertAt.set(i)" title="Insert a block below"><app-icon name="plus" [size]="14" /></button>
+                }
+              </div>
+            } @empty {
+              <div class="card empty">No content blocks yet. Add images, videos or text below. They appear on the page in this order.</div>
+            }
+          </div>
+
+          <div class="card adder adder--main">
+            <strong class="small">Add block</strong>
+            @for (p of presets; track p.id) {
+              <button type="button" class="btn btn--sm" (click)="addBlock(p.id)"><app-icon [name]="p.icon" [size]="14" /> {{ p.label }}</button>
+            }
+          </div>
+        }
+
+        <!-- ---------- LISTING & LANDING ---------- -->
+        @if (tab() === 'landing') {
+          <section class="card stack">
+            <h2>Visibility</h2>
+            <label class="switch"><input type="checkbox" formControlName="listed" /> Show in the works grid (/works)</label>
+            <p class="small muted">Unlisted projects that are published can still be opened by their URL and from landing tiles, and they're skipped by Previous/Next.</p>
+          </section>
+          <section class="card stack">
+            <h2>Landing page tile</h2>
+            <label class="switch"><input type="checkbox" formControlName="featured" /> Feature on the landing page</label>
+            @if (form.controls.featured.value) {
+              <div class="field">
+                <label for="flabel">Tile label <span class="hint">Defaults to the project title</span></label>
+                <input id="flabel" class="input" formControlName="featuredLabel" [placeholder]="form.controls.title.value" />
+              </div>
+              <app-media-field [control]="form.controls.featuredImage" kind="image" label="Tile image" hint="Wide image; defaults to the grid thumbnail" />
+              <p class="small muted">Set the tile order on <a routerLink="/admin/featured">Landing tiles</a>. A tile links to this project's page only when it has content blocks.</p>
+            }
+          </section>
+        }
+
+        <!-- ---------- SEO ---------- -->
+        @if (tab() === 'seo') {
+          <section class="card stack" formGroupName="seo">
+            <div class="field">
+              <label for="mt">Meta title <span class="hint">{{ form.controls.seo.controls.metaTitle.value.length }}/60 recommended</span></label>
+              <input id="mt" class="input" formControlName="metaTitle" [placeholder]="form.controls.title.value" />
+            </div>
+            <div class="field">
+              <label for="md">Meta description <span class="hint">{{ form.controls.seo.controls.metaDescription.value.length }}/160 recommended</span></label>
+              <textarea id="md" class="textarea" rows="3" formControlName="metaDescription" [placeholder]="form.controls.result.value"></textarea>
+            </div>
+            <app-media-field [control]="form.controls.seo.controls.ogImage" kind="image" label="Social share image" hint="1200×630; defaults to the hero image" />
+            <div class="serp">
+              <div class="serp__title">{{ form.controls.seo.controls.metaTitle.value || form.controls.title.value || 'Project title' }} | WARC LTD.</div>
+              <div class="serp__url">/works/{{ form.controls.slug.value || 'slug' }}</div>
+              <div class="serp__desc">{{ form.controls.seo.controls.metaDescription.value || form.controls.result.value || 'Description…' }}</div>
+            </div>
+          </section>
+        }
+      </form>
+
+      <!-- ============ live preview ============ -->
+      @if (showPreview()) {
+        <aside class="previewcol">
+          <div class="preview-head row">
+            <strong class="small">Live preview</strong>
+            <span class="spacer"></span>
+            <div class="seg">
+              <button type="button" [class.is-on]="device() === 'desktop'" (click)="device.set('desktop')" title="Desktop (1440px)"><app-icon name="desktop" [size]="14" /></button>
+              <button type="button" [class.is-on]="device() === 'mobile'" (click)="device.set('mobile')" title="Mobile (390px)"><app-icon name="mobile" [size]="14" /></button>
+            </div>
+          </div>
+          <div class="preview-scroll">
+            <app-preview-frame [device]="device()">
+              <app-project-view [project]="preview()" [heroAutoplay]="false" />
+            </app-preview-frame>
+          </div>
+        </aside>
+      }
+    </div>
+  }
+</div>
