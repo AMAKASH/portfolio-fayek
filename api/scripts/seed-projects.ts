@@ -45,14 +45,16 @@ const LANDING_TILES: { title: string; image: string; matchTitle?: string }[] = [
 
 /**
  * - Some entries hold two URLs concatenated (".../file.mp4?updatedAt=123../../../assets/...") → keep the first.
- * - Local "../../../assets/..." paths become absolute on the public site so they work from any route / the admin.
+ * - Local "../../../assets/..." paths become root-relative "/assets/..." (then migrate them with migrate:assets).
  */
 function fixUrl(raw: string): string {
   let u = (raw ?? '').trim();
   const glued = u.indexOf('../', 1);
   if (/^https?:\/\//.test(u) && glued > 0) u = u.slice(0, glued);
   const local = u.match(/^(?:\.\.\/)+assets\/(.*)$/);
-  if (local) u = `${env.PUBLIC_SITE_URL}/assets/${encodeURI(local[1]!)}`;
+  // Root-relative, never localhost. These files are git-ignored in the UI, so run
+  // `npm run migrate:assets -- --apply` after seeding to move them to S3/CloudFront.
+  if (local) u = `/assets/${encodeURI(local[1]!)}`;
   return u;
 }
 

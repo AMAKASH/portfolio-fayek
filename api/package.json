@@ -19,7 +19,8 @@
     "db:indexes": "tsx --env-file-if-exists=.env scripts/sync-indexes.ts",
     "seed:prod": "node dist/scripts/seed-projects.js",
     "admin:create:prod": "node dist/scripts/create-admin.js",
-    "db:indexes:prod": "node dist/scripts/sync-indexes.js"
+    "db:indexes:prod": "node dist/scripts/sync-indexes.js",
+    "migrate:assets": "tsx --env-file-if-exists=.env scripts/migrate-local-assets.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1172.0",
