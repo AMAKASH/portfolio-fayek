@@ -70,6 +70,7 @@ Public routes are lazy children of `PagesComponent` (`<app-header>` + outlet).
   - Nav labels and paths are the `items` and `paths` arrays in `header.component.ts`: Home, Work, Contact.
   - "Contact" calls `openContact()`, which expands the panel (navigating home first if needed).
   - The client-logo strip was removed from the panel; the expanded height (`.grow.active`) is 350px.
+  - **Header ticker** (the scrolling texts beside the logo) comes from `settings.ticker.items`. It is rendered twice for a seamless loop, and its speed scales with the text length (`tickerDuration()`; 15s for the original list). An empty list hides it.
   - **Logo, contact heading/text and links are dynamic** (admin → Site settings). Platforms and their icons are defined in `CONTACT_PLATFORMS` in [site.service.ts](src/app/core/services/site.service.ts): PNG pairs for email, WhatsApp, Instagram, Facebook and location; LinkedIn is an inline SVG (`.btn2--svg`); `custom` uses an uploaded icon (`.btn2--custom`). `linkHref()` turns a bare email into `mailto:` and a bare phone number into `wa.me`. LinkedIn is an inline SVG (`.btn2--svg`) styled like the PNGs: 20% white disc, 60% white glyph, 100% on hover.
   - Facebook and Location are available as platforms; add them in the admin. Old Maps link: `https://www.google.com/maps/place/Warc+Limited/@23.7888658,90.4020894,21z`.
   - Social `href`s are empty.
@@ -202,6 +203,7 @@ Public routes are lazy children of `PagesComponent` (`<app-header>` + outlet).
 - **Home page** (`/admin/home`): hero image, mobile image and video, plus the "Works" button position (desktop and mobile sliders), with a live preview.
 - **Site settings** (`/admin/site`), with previews:
   - Branding: header logo and favicon.
+  - Header ticker: texts as chips (drag to reorder), with a live preview.
   - Contact panel: heading, text, and links (drag to reorder; platform, URL, label, custom icon).
   - Project page CTA: heading, lines, button label and link.
 - **Landing tiles** (`/admin/featured`): order the tiles and add or remove them.
