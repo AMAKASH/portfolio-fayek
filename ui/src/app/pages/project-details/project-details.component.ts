@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
+import { CONTACT } from '../../core/contact';
 import { HeaderComponent } from '../../core/header/header.component';
 import { PublicProject } from '../../core/models/project';
 import { ProjectViewComponent } from '../../shared/project-view/project-view.component';
@@ -17,6 +18,7 @@ import { ProjectViewComponent } from '../../shared/project-view/project-view.com
 })
 export class ProjectDetailsComponent {
   readonly project = signal<PublicProject | null>(null);
+  readonly contact = CONTACT;
 
   private title = inject(Title);
   private meta = inject(Meta);

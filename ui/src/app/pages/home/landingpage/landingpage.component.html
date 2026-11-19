@@ -5,7 +5,9 @@
       <div class="mainContainer">
             <div class="fullcontainer">
 
-               <div class="HeroSection">
+               <div class="HeroSection"
+                    [style.--hero-btn-top]="hero() ? hero()!.buttonTopDesktop + '%' : null"
+                    [style.--hero-btn-top-mobile]="hero() ? hero()!.buttonTopMobile + '%' : null">
                   <!-- Hero: managed in /admin/home (API: GET /api/v1/settings) -->
                   <div class="image">
                      @if (hero(); as hero) {
@@ -24,7 +26,7 @@
                   </div>
                  <div class="text">
                   <button class="btn" routerLink="/works">
-                     All Projects
+                     Works
                   </button>
                  </div>
 

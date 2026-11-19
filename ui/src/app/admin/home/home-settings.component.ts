@@ -3,13 +3,15 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { firstValueFrom, map, startWith } from 'rxjs';
 import { apiErrorMessage } from '../../core/api/api-error';
-import { SiteService } from '../../core/services/site.service';
+import { FALLBACK_HOME_HERO, SiteService } from '../../core/services/site.service';
 import { MediaFieldComponent } from '../projects/editor/media-field.component';
 import { ToastService } from '../services/toast.service';
 import { IconComponent } from '../shared/icon.component';
 import { HasUnsavedChanges } from '../shared/unsaved-changes.guard';
 
 const url = (v = '') => new FormControl(v, { nonNullable: true, validators: [Validators.maxLength(2048)] });
+const pct = (v: number) =>
+  new FormControl(v, { nonNullable: true, validators: [Validators.required, Validators.min(0), Validators.max(100)] });
 
 /** Home page settings: the landing hero (image, optional mobile crop, optional video). */
 @Component({
@@ -44,6 +46,25 @@ const url = (v = '') => new FormControl(v, { nonNullable: true, validators: [Val
               <label for="alt">Alt text</label>
               <input id="alt" class="input" formControlName="alt" placeholder="Describe the image for screen readers" />
             </div>
+
+            <h2 style="margin-top:8px">"Works" button position</h2>
+            <p class="small muted">Distance from the top of the hero, in % of its height (0 = top edge, 100 = bottom edge). Drag and watch the preview.</p>
+            <div class="pos">
+              <label for="btd">Desktop</label>
+              <input id="btd" type="range" min="0" max="100" step="0.5" formControlName="buttonTopDesktop" />
+              <span class="num"><input class="input" type="number" min="0" max="100" step="0.5" [value]="value().buttonTopDesktop" (input)="setPct('buttonTopDesktop', $event)" aria-label="Desktop position %" />%</span>
+              <button type="button" class="btn btn--sm btn--ghost" (click)="resetButton('buttonTopDesktop')"
+                      [disabled]="value().buttonTopDesktop === defaults.buttonTopDesktop">Reset ({{ defaults.buttonTopDesktop }}%)</button>
+
+              <label for="btm">Mobile</label>
+              <input id="btm" type="range" min="0" max="100" step="0.5" formControlName="buttonTopMobile" />
+              <span class="num"><input class="input" type="number" min="0" max="100" step="0.5" [value]="value().buttonTopMobile" (input)="setPct('buttonTopMobile', $event)" aria-label="Mobile position %" />%</span>
+              <button type="button" class="btn btn--sm btn--ghost" (click)="resetButton('buttonTopMobile')"
+                      [disabled]="value().buttonTopMobile === defaults.buttonTopMobile">Reset ({{ defaults.buttonTopMobile }}%)</button>
+            </div>
+            @if (form.controls.buttonTopDesktop.invalid || form.controls.buttonTopMobile.invalid) {
+              <span class="err small">Positions must be between 0 and 100.</span>
+            }
           </section>
 
           <aside class="card stack preview">
@@ -55,7 +76,7 @@ const url = (v = '') => new FormControl(v, { nonNullable: true, validators: [Val
               } @else if (value().image) {
                 <img [src]="value().image" [alt]="value().alt" />
               }
-              <span class="fake-btn">All Projects</span>
+              <span class="fake-btn" [style.top.%]="value().buttonTopDesktop">Works</span>
             </div>
             <span class="small muted">Mobile</span>
             <div class="frame frame--mobile">
@@ -64,7 +85,7 @@ const url = (v = '') => new FormControl(v, { nonNullable: true, validators: [Val
               } @else if (value().mobileImage || value().image) {
                 <img [src]="value().mobileImage || value().image" [alt]="value().alt" />
               }
-              <span class="fake-btn">All Projects</span>
+              <span class="fake-btn" [style.top.%]="value().buttonTopMobile">Works</span>
             </div>
           </aside>
         </div>
@@ -106,10 +127,38 @@ const url = (v = '') => new FormControl(v, { nonNullable: true, validators: [Val
         width: 140px;
         aspect-ratio: 1 / 1.8;
       }
+      .pos {
+        display: grid;
+        grid-template-columns: 70px minmax(0, 1fr) auto auto;
+        gap: 10px 12px;
+        align-items: center;
+        label {
+          font-weight: 600;
+          font-size: 12.5px;
+        }
+        input[type='range'] {
+          width: 100%;
+          accent-color: var(--a-accent);
+        }
+        .num {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          .input {
+            width: 76px;
+          }
+        }
+        @media (max-width: 560px) {
+          grid-template-columns: 60px minmax(0, 1fr);
+          .num,
+          .btn {
+            grid-column: 2;
+          }
+        }
+      }
       .fake-btn {
         position: absolute;
         left: 50%;
-        top: 15%;
         transform: translateX(-50%);
         font-size: 9px;
         color: #fff;
@@ -119,7 +168,6 @@ const url = (v = '') => new FormControl(v, { nonNullable: true, validators: [Val
         white-space: nowrap;
       }
       .frame--mobile .fake-btn {
-        top: 23%;
         font-size: 7px;
       }
     `,
@@ -138,7 +186,24 @@ export class HomeSettingsComponent implements HasUnsavedChanges {
     video: url(),
     poster: url(),
     alt: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(300)] }),
+    buttonTopDesktop: pct(FALLBACK_HOME_HERO.buttonTopDesktop),
+    buttonTopMobile: pct(FALLBACK_HOME_HERO.buttonTopMobile),
   });
+  readonly defaults = FALLBACK_HOME_HERO;
+
+  /** The number box mirrors the slider; two inputs can't share one control (they don't sync each other). */
+  setPct(which: 'buttonTopDesktop' | 'buttonTopMobile', ev: Event) {
+    const raw = (ev.target as HTMLInputElement).value;
+    const n = Number.parseFloat(raw);
+    if (raw === '' || Number.isNaN(n)) return;
+    this.form.controls[which].setValue(Math.min(100, Math.max(0, n)));
+    this.form.controls[which].markAsDirty();
+  }
+
+  resetButton(which: 'buttonTopDesktop' | 'buttonTopMobile') {
+    this.form.controls[which].setValue(FALLBACK_HOME_HERO[which]);
+    this.form.controls[which].markAsDirty();
+  }
   readonly value = toSignal(
     this.form.valueChanges.pipe(
       map(() => this.form.getRawValue()),

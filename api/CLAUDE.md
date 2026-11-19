@@ -28,6 +28,7 @@ src/
     users/         User model (single admin)
     projects/      Project model, public + admin routers
     media/         presign / confirm / library / delete
+    settings/      single `Settings` doc (key 'site'): editable site content (home hero)
     health/        GET /health (pings Mongo; used by the Docker HEALTHCHECK)
 scripts/           seed-projects, create-admin, sync-indexes
 seed/              project_data.json (original UI JSON; it's inside the API so the Docker build context has it)
@@ -118,6 +119,15 @@ Express 5 forwards rejected promises to `errorHandler`, so controllers don't nee
 | `GET /admin/media?kind=&search=&page=` | Library list |
 | `PATCH /admin/media/:id` | `{alt}` |
 | `DELETE /admin/media/:id` | Returns 409 `MEDIA_IN_USE` if any project references the URL |
+
+**Settings** (`settings` module):
+
+| Endpoint | Purpose |
+|---|---|
+| `GET /settings` | Public, cached. Returns `{homeHero:{image, mobileImage, video, poster, alt, buttonTopDesktop, buttonTopMobile}}`, with defaults if nothing has been saved. |
+| `GET/PUT /admin/settings` | Admin read and replace. Positions are 0–100 (%); defaults are 72 and 67. |
+
+Media deletion also checks settings references.
 
 **Errors** are always `{error:{message, code?, details?}}`. Zod failures return 400 `VALIDATION` with `details[{path,message}]`, and duplicate keys return 409 `DUPLICATE`.
 

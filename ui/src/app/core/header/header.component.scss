@@ -326,3 +326,27 @@
 
 
 
+
+// LinkedIn icon (inline SVG) styled to match the PNG social icons:
+// 20% white disc, 60% white glyph, full white on hover.
+.btn2--svg {
+  cursor: pointer;
+  svg {
+    display: block;
+    width: 40px;
+    height: 40px;
+  }
+  .disc {
+    fill: rgba(255, 255, 255, 0.2);
+  }
+  .glyph {
+    fill: rgba(255, 255, 255, 0.6);
+    transition: fill 0.15s;
+  }
+  &:hover .glyph {
+    fill: #fff;
+  }
+}
+a:focus-visible .btn2--svg .glyph {
+  fill: #fff;
+}

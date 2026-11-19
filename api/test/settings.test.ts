@@ -21,5 +21,16 @@ describe('settings', () => {
     const pub = await request(app).get('/api/v1/settings').expect(200);
     expect(pub.body.homeHero.image).toBe('https://cdn.test/hero.jpg');
     expect(pub.body.homeHero.alt).toBe('Hero');
+    // button position defaults when omitted, validates range, and round-trips
+    expect(pub.body.homeHero.buttonTopDesktop).toBe(72);
+    expect(pub.body.homeHero.buttonTopMobile).toBe(67);
+    await request(app).put('/api/v1/admin/settings').set(auth).send({ homeHero: { ...body.homeHero, buttonTopDesktop: 140 } }).expect(400);
+    const moved = await request(app)
+      .put('/api/v1/admin/settings')
+      .set(auth)
+      .send({ homeHero: { ...body.homeHero, buttonTopDesktop: 50, buttonTopMobile: 40.5 } })
+      .expect(200);
+    expect(moved.body.homeHero.buttonTopDesktop).toBe(50);
+    expect(moved.body.homeHero.buttonTopMobile).toBe(40.5);
   });
 });

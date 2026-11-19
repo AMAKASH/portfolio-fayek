@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, ViewChild } from '@angular/core';
 import { ObserverService } from '../../services/observer.service';
+import { CONTACT } from '../contact';
 
 @Component({
   selector: 'app-header',
@@ -31,6 +32,7 @@ ngAfterViewInit(){
 }
 
 isHovered = -1;
+readonly contact = CONTACT;
 
 // "About" is hidden for now (route removed in app.routes.ts; TeamPageComponent kept for later).
 items = ['Home', 'Work', 'Contact'];

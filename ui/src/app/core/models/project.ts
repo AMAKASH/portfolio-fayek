@@ -158,6 +158,9 @@ export interface HomeHero {
   video: string;
   poster: string;
   alt: string;
+  /** "Works" button position, % from the top of the hero */
+  buttonTopDesktop: number;
+  buttonTopMobile: number;
 }
 
 export interface SiteSettings {

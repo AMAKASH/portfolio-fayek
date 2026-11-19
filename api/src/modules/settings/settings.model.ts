@@ -8,6 +8,9 @@ export const DEFAULT_HOME_HERO = {
   video: '',
   poster: '',
   alt: '',
+  /** "All Projects" button vertical position, % from the top of the hero */
+  buttonTopDesktop: 72,
+  buttonTopMobile: 67,
 };
 
 /**
@@ -25,6 +28,9 @@ const settingsSchema = new Schema(
       video: { type: String, default: '' },
       poster: { type: String, default: '' },
       alt: { type: String, default: '' },
+      /** "All Projects" button position (% from the top of the hero) */
+      buttonTopDesktop: { type: Number, default: DEFAULT_HOME_HERO.buttonTopDesktop },
+      buttonTopMobile: { type: Number, default: DEFAULT_HOME_HERO.buttonTopMobile },
     },
   },
   { timestamps: true },

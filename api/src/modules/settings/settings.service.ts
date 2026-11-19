@@ -14,6 +14,8 @@ function serialize(doc: any) {
       video: h.video ?? '',
       poster: h.poster ?? '',
       alt: h.alt ?? '',
+      buttonTopDesktop: typeof h.buttonTopDesktop === 'number' ? h.buttonTopDesktop : DEFAULT_HOME_HERO.buttonTopDesktop,
+      buttonTopMobile: typeof h.buttonTopMobile === 'number' ? h.buttonTopMobile : DEFAULT_HOME_HERO.buttonTopMobile,
     },
     updatedAt: doc?.updatedAt ?? null,
   };

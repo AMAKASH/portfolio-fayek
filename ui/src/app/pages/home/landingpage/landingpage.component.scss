@@ -12,6 +12,9 @@
       gap: 0.5rem;
 
       .HeroSection {
+        // The "Works" button is positioned relative to the hero (not the whole
+        // section), so its spot doesn't drift with the number of landing tiles.
+        position: relative;
         // Dynamic hero renders <picture><source><img> (optional mobile crop)
         picture {
           display: block;
@@ -98,7 +101,9 @@
             transform: translate(-50%);
             border: none;
             color: white;
-            top: 15%;
+            // % of the hero height, set in the admin (Home page → button position) via CSS vars
+            // on .HeroSection. Fallbacks are the defaults.
+            top: var(--hero-btn-top, 72%);
             width: 240px;
             height: 45px;
             flex-shrink: 0;
@@ -108,7 +113,7 @@
             backdrop-filter: blur(41.04999923706055px);
 
             @media(max-width:500px){
-              top: 23%;
+              top: var(--hero-btn-top-mobile, 67%);
             }
           }
         }

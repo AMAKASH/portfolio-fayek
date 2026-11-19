@@ -12,6 +12,8 @@ export const FALLBACK_HOME_HERO: HomeHero = {
   video: '',
   poster: '',
   alt: '',
+  buttonTopDesktop: 72,
+  buttonTopMobile: 67,
 };
 
 /** Public site settings (home hero, ...). */

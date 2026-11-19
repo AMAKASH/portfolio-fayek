@@ -65,16 +65,20 @@ Public routes are lazy children of `PagesComponent` (`<app-header>` + outlet).
     - `media` + `split`: `.doubleImage` when both items are images; `.doubleVideo` with `.videoChild` for two videos or a mixed pair
     - `text`: `.textBlock`
   - Below-the-fold videos use [AutoplayInViewDirective](src/app/shared/autoplay-in-view.directive.ts), which plays them only while visible. Images are `loading="lazy"`.
-- **Details page chrome** (contact CTA, previous/next preview): [pages/project-details/](src/app/pages/project-details/). Prev/next comes from the API, ordered by the admin order, and wraps around.
+- **Details page chrome** (contact CTA "Let's Talk" → WhatsApp, previous/next preview): [pages/project-details/](src/app/pages/project-details/). Prev/next comes from the API, ordered by the admin order, and wraps around.
 - **Header / nav / contact panel / social buttons / service marquee**: [core/header/](src/app/core/header/).
   - Nav labels and paths are the `items` and `paths` arrays in `header.component.ts`: Home, Work, Contact.
   - "Contact" calls `openContact()`, which expands the panel (navigating home first if needed).
   - The client-logo strip was removed from the panel; the expanded height (`.grow.active`) is 350px.
+  - Contact icons: Email (mailto), WhatsApp, Instagram, LinkedIn. URLs live in [core/contact.ts](src/app/core/contact.ts) (`CONTACT`), shared with the details page "Let's Talk" button. LinkedIn is an inline SVG (`.btn2--svg`) styled like the PNGs: 20% white disc, 60% white glyph, 100% on hover.
+  - Facebook and Google Maps buttons are hidden. To restore, re-add buttons with the ImageKit icons `.../assets/header/socials/Facebook.png` / `hoveredFacebook.png` and `location.png` / `hoveredLocation.png` (Maps link: `https://www.google.com/maps/place/Warc+Limited/@23.7888658,90.4020894,21z`).
   - Social `href`s are empty.
 - **Landing page**: [landingpage.component.html](src/app/pages/home/landingpage/landingpage.component.html).
-  - The hero image is hard-coded.
+  - The hero comes from `GET /api/v1/settings` via [SiteService](src/app/core/services/site.service.ts) (falls back to `FALLBACK_HOME_HERO`).
+    - Options: image, mobile image (`<picture>` source at ≤500px), video (replaces the image), poster, alt.
+    - The "Works" button's vertical position is set via the CSS variables `--hero-btn-top` / `--hero-btn-top-mobile` on `.HeroSection` (defaults 72% / 67% of the hero height).
   - The tiles loop over the featured projects; a tile links only when `hasDetails`.
-  - The "All Projects" button links to `/works`.
+  - The "Works" button links to `/works`.
   - The old bottom brand section (`#footer`) was removed.
 - **About/Team page**: [team-page.component.html](src/app/pages/team-page/team-page.component.html), still hard-coded.
   - Each member is a `<swiper-slide>` preceded by a `<!-- Name -->` comment.
@@ -109,6 +113,7 @@ Public routes are lazy children of `PagesComponent` (`<app-header>` + outlet).
   - **Slug:** generated from the title on new projects, with a live availability check.
 - **[MediaFieldComponent](src/app/admin/projects/editor/media-field.component.ts)**: one media slot. It takes drag-drop, upload with progress, a library pick or a pasted URL, plus alt text and a video poster.
   - The upload path is [UploadService](src/app/admin/services/upload.service.ts): presign, then POST to S3 through `HttpBackend` (no interceptors), then confirm with the dimensions measured in the browser.
+- **Home page** (`/admin/home`): hero image, mobile image and video, plus the "Works" button position (desktop and mobile sliders), with a live preview.
 - **Landing tiles** (`/admin/featured`): order the tiles and add or remove them.
 - **Media library** (`/admin/media`): multi-file upload (3 at a time, drop anywhere), filter and search, alt text, copy URL, delete (blocked while in use).
 - **Account** (`/admin/account`): change password.

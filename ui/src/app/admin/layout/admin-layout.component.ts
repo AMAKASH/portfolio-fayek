@@ -20,7 +20,7 @@ import { IconComponent } from '../shared/icon.component';
 
       <aside class="sidebar">
         <div class="brand">
-          <span class="brand__mark">F</span>
+          <img class="brand__mark" [src]="avatar" alt="" width="32" height="32" />
           <span>Fayek Al Rafi</span>
         </div>
         <nav>
@@ -74,14 +74,12 @@ import { IconComponent } from '../shared/icon.component';
         padding: 0 8px;
       }
       .brand__mark {
-        width: 28px;
-        height: 28px;
-        border-radius: 7px;
-        background: var(--a-accent);
-        color: #fff;
-        display: grid;
-        place-items: center;
-        font-size: 13px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: var(--a-subtle);
+        flex-shrink: 0;
       }
       nav {
         display: grid;
@@ -171,6 +169,8 @@ import { IconComponent } from '../shared/icon.component';
 export class AdminLayoutComponent {
   readonly auth = inject(AuthService);
   readonly navOpen = signal(false);
+  /** Sidebar brand photo (served from the S3 bucket through CloudFront). */
+  readonly avatar = 'https://dkr8ufw2tu8er.cloudfront.net/fayek_head_shot.jpg';
   readonly nav = [
     { path: '/admin/projects', label: 'Projects', icon: 'folder' },
     { path: '/admin/home', label: 'Home page', icon: 'image' },

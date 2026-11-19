@@ -85,12 +85,27 @@
               </div> -->
               
 
+              <!-- Contact links. Facebook and Google Maps buttons are hidden; their markup/URLs are noted in ui/CLAUDE.md to restore. -->
               <div class="socialsButtons" >
-                <a href="" target="_blank"><button class="btn2" (mouseover)="isHovered = 0" (mouseleave)="isHovered = -1"><img *ngIf="isHovered!=0" src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/socials/Email.png?updatedAt=1725351159609"  alt=""> <img *ngIf="isHovered==0" src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/socials/hoveredemail.png?updatedAt=1725352918048" alt="Hover Image" /></button></a>
-                <a href="" target="_blank"><button class="btn2" (mouseover)="isHovered = 1" (mouseleave)="isHovered = -1"><img *ngIf="isHovered!=1" src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/socials/Whatsapp.png?updatedAt=1725351159598" alt=""> <img *ngIf="isHovered==1" src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/socials/hoveredwhatsapp.png?updatedAt=1725352917882" alt="Hover Image" /></button></a>
-                <a href="" target="_blank"><button class="btn2" (mouseover)="isHovered = 2" (mouseleave)="isHovered = -1"><img *ngIf="isHovered!=2" src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/socials/Facebook.png?updatedAt=1725351159518" alt=""> <img *ngIf="isHovered==2" src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/socials/hoveredFacebook.png?updatedAt=1725352920595" alt="Hover Image" /></button></a>
-                <a href="" target="_blank"><button class="btn2" (mouseover)="isHovered = 3" (mouseleave)="isHovered = -1"><img *ngIf="isHovered!=3" src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/socials/Instagram.png?updatedAt=1725351159355" alt=""><img *ngIf="isHovered==3" src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/socials/hoveredInsta.png?updatedAt=1725352920655" alt="Hover Image" /></button></a>
-                <a href="https://www.google.com/maps/place/Warc+Limited/@23.7888658,90.4020894,21z/data=!4m17!1m10!3m9!1s0xf3018c648faf3f5:0x456ba708cc5208b8!2sWarc+Limited!8m2!3d23.788877!4d90.4022987!10e5!14m1!1BCgIgAQ!16s%2Fg%2F11v0lmj_35!3m5!1s0xf3018c648faf3f5:0x456ba708cc5208b8!8m2!3d23.788877!4d90.4022987!16s%2Fg%2F11v0lmj_35?entry=ttu&g_ep=EgoyMDI0MDkxNS4wIKXMDSoASAFQAw%3D%3D" target="_blank"><button class="btn2" (mouseover)="isHovered = 4" (mouseleave)="isHovered = -1"><img *ngIf="isHovered!=4" src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/socials/location.png?updatedAt=1725351159574" alt=""><img *ngIf="isHovered==4" src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/socials/hoveredLocation.png?updatedAt=1725352918117" alt="Hover Image" /></button></a>
+                <a [href]="contact.email" aria-label="Email"><button class="btn2" tabindex="-1" (mouseover)="isHovered = 0" (mouseleave)="isHovered = -1"><img *ngIf="isHovered!=0" src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/socials/Email.png?updatedAt=1725351159609" alt=""> <img *ngIf="isHovered==0" src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/socials/hoveredemail.png?updatedAt=1725352918048" alt="" /></button></a>
+                <a [href]="contact.whatsapp" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><button class="btn2" tabindex="-1" (mouseover)="isHovered = 1" (mouseleave)="isHovered = -1"><img *ngIf="isHovered!=1" src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/socials/Whatsapp.png?updatedAt=1725351159598" alt=""> <img *ngIf="isHovered==1" src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/socials/hoveredwhatsapp.png?updatedAt=1725352917882" alt="" /></button></a>
+                <a [href]="contact.instagram" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><button class="btn2" tabindex="-1" (mouseover)="isHovered = 3" (mouseleave)="isHovered = -1"><img *ngIf="isHovered!=3" src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/socials/Instagram.png?updatedAt=1725351159355" alt=""><img *ngIf="isHovered==3" src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/socials/hoveredInsta.png?updatedAt=1725352920655" alt="" /></button></a>
+                <!-- LinkedIn: inline SVG drawn to match the PNG set (20% white disc, 60% white glyph, 100% on hover) -->
+                <a [href]="contact.linkedin" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><button class="btn2 btn2--svg" tabindex="-1">
+                  <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+                    <defs>
+                      <mask id="li-cut">
+                        <rect x="10" y="10" width="20" height="20" rx="3" fill="#fff" />
+                        <circle cx="15" cy="15.2" r="1.6" fill="#000" />
+                        <rect x="13.6" y="17.6" width="2.8" height="8.4" fill="#000" />
+                        <rect x="18" y="17.6" width="2.7" height="8.4" fill="#000" />
+                        <path d="M20.7 20.6C20.7 18.6 22 17.4 23.8 17.4 25.7 17.4 26.6 18.7 26.6 21V26H23.9V21.4C23.9 20.4 23.5 19.8 22.7 19.8 21.8 19.8 20.7 20.4 20.7 21.5Z" fill="#000" />
+                      </mask>
+                    </defs>
+                    <circle cx="20" cy="20" r="20" class="disc" />
+                    <rect x="10" y="10" width="20" height="20" rx="3" class="glyph" mask="url(#li-cut)" />
+                  </svg>
+                </button></a>
               </div>
               
             </div>
