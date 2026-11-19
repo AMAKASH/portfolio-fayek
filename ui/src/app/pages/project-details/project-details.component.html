@@ -6,20 +6,31 @@
       <div class="fullContainer">
         <app-project-view [project]="project" />
 
-        <div class="contact">
-          <div class="contactBody">
-            <div class="heading">
-              <h1>Make Contact, Make Impact.</h1>
-            </div>
-            <div class="subtitle">
-              <h3>WITH US IT HAPPENS.</h3>
-              <h3>WE WOULD LOVE TO HEAR FROM YOU.</h3>
-            </div>
-            <div class="button">
-              <a [href]="contact.whatsapp" target="_blank" rel="noopener noreferrer" aria-label="Let's Talk on WhatsApp"><button class="btn" tabindex="-1">Let's Talk</button></a>
+        <!-- Call to action: admin → Site settings → Project page CTA -->
+        @if (cta(); as cta) {
+          <div class="contact">
+            <div class="contactBody">
+              @if (cta.heading) {
+                <div class="heading">
+                  <h1>{{ cta.heading }}</h1>
+                </div>
+              }
+              @if (cta.lines.length) {
+                <div class="subtitle">
+                  @for (line of cta.lines; track $index) {
+                    <h3>{{ line }}</h3>
+                  }
+                </div>
+              }
+              @if (cta.buttonUrl && cta.buttonLabel) {
+                <div class="button">
+                  <a [href]="ctaHref(cta.buttonUrl)" [attr.target]="ctaInPlace(cta.buttonUrl) ? null : '_blank'"
+                     [attr.rel]="ctaInPlace(cta.buttonUrl) ? null : 'noopener noreferrer'"><button class="btn" tabindex="-1">{{ cta.buttonLabel }}</button></a>
+                </div>
+              }
             </div>
           </div>
-        </div>
+        }
 
         @if (project.next || project.prev) {
           <div class="nextProjectPreview">

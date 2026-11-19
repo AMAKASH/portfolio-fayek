@@ -352,3 +352,19 @@
 a:focus-visible .btn2--svg .glyph {
   fill: #fff;
 }
+
+// Custom contact icon (uploaded image): dimmed to match the PNG set, full on hover.
+.btn2--custom {
+  cursor: pointer;
+  img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    opacity: 0.6;
+    transition: opacity 0.15s;
+  }
+  &:hover img {
+    opacity: 1;
+  }
+}

@@ -163,8 +163,52 @@ export interface HomeHero {
   buttonTopMobile: number;
 }
 
+export type ContactLinkType = 'email' | 'whatsapp' | 'instagram' | 'linkedin' | 'facebook' | 'location' | 'custom';
+
+export interface ContactLink {
+  type: ContactLinkType;
+  /** URL; for email a bare address works, for WhatsApp a phone number works */
+  url: string;
+  /** Accessible name / tooltip (defaults to the platform name) */
+  label: string;
+  /** Icon image, only for `custom` */
+  icon: string;
+}
+
+/** Header contact panel */
+export interface ContactSettings {
+  heading: string;
+  text: string;
+  links: ContactLink[];
+}
+
+/** Call-to-action at the bottom of project pages */
+export interface ProjectCta {
+  heading: string;
+  lines: string[];
+  buttonLabel: string;
+  /** Empty hides the button */
+  buttonUrl: string;
+}
+
+export interface Branding {
+  /** Header logo */
+  logo: string;
+  /** Favicon; empty = bundled icons */
+  favicon: string;
+}
+
+/** Header ticker: texts scrolling beside the logo */
+export interface Ticker {
+  items: string[];
+}
+
 export interface SiteSettings {
   homeHero: HomeHero;
+  branding: Branding;
+  ticker: Ticker;
+  contact: ContactSettings;
+  projectCta: ProjectCta;
   updatedAt: string | null;
 }
 

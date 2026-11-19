@@ -34,3 +34,57 @@ describe('settings', () => {
     expect(moved.body.homeHero.buttonTopMobile).toBe(40.5);
   });
 });
+
+describe('settings: contact + project CTA', () => {
+  it('serves defaults, updates sections independently, and validates custom links', async () => {
+    const pub0 = await request(app).get('/api/v1/settings').expect(200);
+    expect(pub0.body.contact.links.map((l: any) => l.type)).toEqual(['email', 'whatsapp', 'instagram', 'linkedin']);
+    expect(pub0.body.projectCta.buttonLabel).toBe("Let's Talk");
+    expect(pub0.body.branding.logo).toMatch(/rafi_logo.png$/);
+    expect(pub0.body.branding.favicon).toBe('');
+    expect(pub0.body.ticker.items).toHaveLength(7);
+
+    const { auth } = await loginAgent();
+    // saving the hero must not wipe the contact defaults
+    await request(app).put('/api/v1/admin/settings').set(auth).send({ homeHero: { image: 'https://cdn.test/h.jpg' } }).expect(200);
+    let pub = await request(app).get('/api/v1/settings').expect(200);
+    expect(pub.body.contact.links).toHaveLength(4);
+    expect(pub.body.projectCta.lines).toHaveLength(2);
+
+    await request(app)
+      .put('/api/v1/admin/settings')
+      .set(auth)
+      .send({ contact: { heading: 'Hi', text: 'Say hi', links: [{ type: 'custom', url: 'https://x.test' }] } })
+      .expect(400);
+
+    await request(app)
+      .put('/api/v1/admin/settings')
+      .set(auth)
+      .send({
+        contact: { heading: 'Hi', text: '', links: [{ type: 'linkedin', url: 'https://linkedin.com/in/x' }] },
+        projectCta: { heading: 'Talk?', lines: ['One line'], buttonLabel: 'Email me', buttonUrl: 'me@x.test' },
+      })
+      .expect(200);
+    pub = await request(app).get('/api/v1/settings').expect(200);
+    expect(pub.body.contact).toMatchObject({ heading: 'Hi', text: '', links: [{ type: 'linkedin', label: '', icon: '' }] });
+    expect(pub.body.projectCta).toEqual({ heading: 'Talk?', lines: ['One line'], buttonLabel: 'Email me', buttonUrl: 'me@x.test' });
+    expect(pub.body.homeHero.image).toBe('https://cdn.test/h.jpg'); // untouched
+
+    await request(app).put('/api/v1/admin/settings').set(auth).send({ branding: { logo: '' } }).expect(400);
+    await request(app).put('/api/v1/admin/settings').set(auth).send({ branding: { logo: 'https://cdn.test/logo.svg', favicon: 'https://cdn.test/fav.png' } }).expect(200);
+    pub = await request(app).get('/api/v1/settings').expect(200);
+    expect(pub.body.branding).toEqual({ logo: 'https://cdn.test/logo.svg', favicon: 'https://cdn.test/fav.png' });
+    expect(pub.body.contact.heading).toBe('Hi'); // untouched
+
+    await request(app).put('/api/v1/admin/settings').set(auth).send({ ticker: { items: ['  '] } }).expect(400);
+    await request(app).put('/api/v1/admin/settings').set(auth).send({ ticker: { items: ['Branding', 'Film'] } }).expect(200);
+    pub = await request(app).get('/api/v1/settings').expect(200);
+    expect(pub.body.ticker.items).toEqual(['Branding', 'Film']);
+    expect(pub.body.branding.logo).toBe('https://cdn.test/logo.svg'); // untouched
+
+    // an emptied link list is respected (not replaced by defaults)
+    await request(app).put('/api/v1/admin/settings').set(auth).send({ contact: { heading: '', text: '', links: [] } }).expect(200);
+    pub = await request(app).get('/api/v1/settings').expect(200);
+    expect(pub.body.contact.links).toEqual([]);
+  });
+});

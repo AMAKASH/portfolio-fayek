@@ -1,0 +1,203 @@
+<div class="page" style="max-width: 1180px">
+  <div class="page__head">
+    <h1>Site settings</h1>
+    <a class="btn" href="/" target="_blank" rel="noopener"><app-icon name="external" /> View site</a>
+    <button class="btn btn--primary" type="button" (click)="save()" [disabled]="saving() || loading() || form.pristine" title="Ctrl/⌘ + S">
+      @if (saving()) { <span class="adm-spinner" style="width:14px;height:14px"></span> } Save
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="empty"><span class="adm-spinner"></span></div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="save()" class="stack">
+      <!-- ================= Branding ================= -->
+      <section class="card stack" formGroupName="branding">
+        <h2>Branding</h2>
+        <div class="cols">
+          <div class="stack">
+            <app-media-field [control]="form.controls.branding.controls.logo" kind="image" label="Header logo"
+                             hint="White logo on a transparent background (PNG/SVG), shown 14px tall" />
+            @if (form.controls.branding.controls.logo.touched && form.controls.branding.controls.logo.invalid) {
+              <span class="err small">A header logo is required.</span>
+            }
+            <app-media-field [control]="form.controls.branding.controls.favicon" kind="image" label="Favicon"
+                             hint="Square PNG or SVG, at least 192×192. Leave empty to use the built-in “FR” icon" />
+          </div>
+          <div class="stack">
+            <span class="small muted">Header preview</span>
+            <div class="hdr">
+              @if (value().branding.logo) { <img [src]="value().branding.logo" alt="Logo preview" /> }
+            </div>
+            <span class="small muted">Browser tab preview</span>
+            <div class="tab">
+              <img [src]="value().branding.favicon || '/assets/icons/favicon-32.png'" alt="" />
+              <span>Fayek Al Rafi</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= Header ticker ================= -->
+      <section class="card stack">
+        <h2>Header ticker</h2>
+        <p class="small muted">The texts scrolling beside the logo in the header. Drag to reorder; remove all to hide the ticker. Speed adjusts to the total length.</p>
+        <div class="cols">
+          <div class="stack">
+            <div class="chips" cdkDropList cdkDropListOrientation="horizontal" (cdkDropListDropped)="dropTickerItem($event)">
+              @for (c of tickerItems.controls; track c; let i = $index) {
+                <span class="chip" cdkDrag cdkDragPreviewContainer="parent">
+                  <input class="chip__input" [formControl]="c" [style.width.ch]="(c.value.length || 4) + 1" [attr.aria-label]="'Ticker item ' + (i + 1)" />
+                  <button type="button" class="chip__x" (click)="removeTickerItem(i)" aria-label="Remove"><app-icon name="x" [size]="12" /></button>
+                </span>
+              }
+              <input #tk class="input chip-add" placeholder="Add and press Enter" maxlength="60"
+                     (keydown.enter)="$event.preventDefault(); addTickerItem(tk)" (blur)="addTickerItem(tk)" />
+            </div>
+            @if (tickerItems.invalid) { <span class="err small">Ticker items can't be empty (max 60 characters).</span> }
+          </div>
+          <div class="stack">
+            <span class="small muted">Preview</span>
+            <div class="ticker">
+              @if (value().ticker.items.length) {
+                <div class="ticker__track" [style.animation-duration.s]="tickerSeconds(value().ticker.items)">
+                  @for (copy of [0, 1]; track copy) {
+                    <span class="ticker__set">
+                      @for (t of value().ticker.items; track $index) { <span class="ticker__item">{{ t }}</span> }
+                    </span>
+                  }
+                </div>
+              } @else {
+                <span class="small" style="color:#aaa;padding:0 14px">Ticker hidden</span>
+              }
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= Contact panel ================= -->
+      <section class="card stack" formGroupName="contact">
+        <h2>Contact panel</h2>
+        <p class="small muted">The panel that opens from the header (Contact, or scrolling past the end of the home page).</p>
+        <div class="cols">
+          <div class="stack">
+            <div class="field">
+              <label for="ch">Heading</label>
+              <input id="ch" class="input" formControlName="heading" />
+            </div>
+            <div class="field">
+              <label for="ct">Text</label>
+              <textarea id="ct" class="textarea" rows="3" formControlName="text"></textarea>
+            </div>
+
+            <div class="field">
+              <span class="field__label">Links <span class="hint">Drag to reorder. Email accepts a plain address and WhatsApp a phone number.</span></span>
+              <div class="links" cdkDropList (cdkDropListDropped)="dropLink($event)">
+                @for (l of links.controls; track l; let i = $index; let first = $first; let last = $last) {
+                  <div class="link" cdkDrag cdkDragPreviewContainer="parent" [formGroup]="l">
+                    <span class="drag-handle" cdkDragHandle title="Drag to reorder"><app-icon name="grip" /></span>
+                    <div class="link__body">
+                      <div class="link__row">
+                        <select class="select" formControlName="type" aria-label="Platform">
+                          @for (t of platformTypes; track t) { <option [value]="t">{{ platforms[t].name }}</option> }
+                        </select>
+                        <input class="input" formControlName="url" [placeholder]="platforms[l.controls.type.value].placeholder" aria-label="Link" />
+                      </div>
+                      <div class="link__row">
+                        <input class="input" formControlName="label" [placeholder]="'Label (default: ' + platforms[l.controls.type.value].name + ')'" aria-label="Label" />
+                      </div>
+                      @if (l.controls.type.value === 'custom') {
+                        <app-media-field [control]="l.controls.icon" kind="image" label="Icon" hint="Square image; shown as a 40px circle" [compact]="true" />
+                        @if (!l.controls.icon.value && l.touched) { <span class="err small">Custom links need an icon.</span> }
+                      }
+                      @if (l.controls.url.touched && l.controls.url.invalid) { <span class="err small">Add a link.</span> }
+                    </div>
+                    <div class="link__actions">
+                      <button class="btn btn--ghost btn--icon" type="button" (click)="moveLink(i, i - 1)" [disabled]="first" aria-label="Move up"><app-icon name="up" /></button>
+                      <button class="btn btn--ghost btn--icon" type="button" (click)="moveLink(i, i + 1)" [disabled]="last" aria-label="Move down"><app-icon name="down" /></button>
+                      <button class="btn btn--ghost btn--icon btn--danger" type="button" (click)="removeLink(i)" aria-label="Remove"><app-icon name="trash" /></button>
+                    </div>
+                  </div>
+                } @empty {
+                  <div class="empty small">No contact links. The panel will show only the texts.</div>
+                }
+              </div>
+              <div class="row">
+                <span class="small muted">Add:</span>
+                @for (t of platformTypes; track t) {
+                  <button type="button" class="btn btn--sm" (click)="addLink(t)"><app-icon name="plus" [size]="12" /> {{ platforms[t].name }}</button>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- live preview of the dark panel -->
+          <div class="stack">
+            <span class="small muted">Preview</span>
+            <div class="panel">
+              @if (value().contact.heading) { <h3>{{ value().contact.heading }}</h3> }
+              @if (value().contact.text) { <p>{{ value().contact.text }}</p> }
+              <div class="icons">
+                @for (l of value().contact.links; track $index) {
+                  <a [href]="href(l)" target="_blank" rel="noopener" [title]="label(l) + ' → ' + href(l)">
+                    @if (l.type === 'custom') {
+                      <img class="ic ic--custom" [src]="l.icon" alt="" />
+                    } @else if (l.type === 'linkedin') {
+                      <span class="ic ic--li">in</span>
+                    } @else {
+                      <img class="ic" [src]="platforms[l.type].icon" alt="" />
+                    }
+                  </a>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= Project page CTA ================= -->
+      <section class="card stack" formGroupName="projectCta">
+        <h2>Project page call-to-action</h2>
+        <p class="small muted">The section at the bottom of every project page.</p>
+        <div class="cols">
+          <div class="stack">
+            <div class="field">
+              <label for="ph">Heading</label>
+              <input id="ph" class="input" formControlName="heading" />
+            </div>
+            <div class="field">
+              <span class="field__label">Text lines</span>
+              @for (c of lines.controls; track c; let i = $index) {
+                <div class="row">
+                  <input class="input" style="flex:1" [formControl]="c" [attr.aria-label]="'Line ' + (i + 1)" />
+                  <button class="btn btn--ghost btn--icon btn--danger" type="button" (click)="removeLine(i)" aria-label="Remove line"><app-icon name="trash" /></button>
+                </div>
+              }
+              <div><button class="btn btn--sm" type="button" (click)="addLine()"><app-icon name="plus" [size]="12" /> Add line</button></div>
+            </div>
+            <div class="grid-2">
+              <div class="field">
+                <label for="bl">Button label</label>
+                <input id="bl" class="input" formControlName="buttonLabel" />
+              </div>
+              <div class="field">
+                <label for="bu">Button link <span class="hint">Empty hides the button</span></label>
+                <input id="bu" class="input" formControlName="buttonUrl" placeholder="https://wa.me/… or you@example.com" />
+              </div>
+            </div>
+          </div>
+          <div class="stack">
+            <span class="small muted">Preview</span>
+            <div class="cta">
+              @if (value().projectCta.heading) { <h4>{{ value().projectCta.heading }}</h4> }
+              @for (line of value().projectCta.lines; track $index) { <h5>{{ line }}</h5> }
+              @if (value().projectCta.buttonUrl && value().projectCta.buttonLabel) {
+                <a class="cta__btn" [href]="ctaHref(value().projectCta.buttonUrl)" target="_blank" rel="noopener">{{ value().projectCta.buttonLabel }}</a>
+              }
+            </div>
+          </div>
+        </div>
+      </section>
+    </form>
+  }
+</div>

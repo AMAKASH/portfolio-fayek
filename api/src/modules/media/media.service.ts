@@ -157,7 +157,7 @@ export async function remove(id: string): Promise<void> {
   if (!doc) throw HttpError.notFound('Media not found');
   const [refs, settingsRefs] = await Promise.all([countUrlReferences(doc.url), countSettingsReferences(doc.url)]);
   if (refs > 0 || settingsRefs > 0) {
-    const where = [refs ? `${refs} project(s)` : '', settingsRefs ? 'the home page hero' : ''].filter(Boolean).join(' and ');
+    const where = [refs ? `${refs} project(s)` : '', settingsRefs ? 'site settings (hero, branding or contact icons)' : ''].filter(Boolean).join(' and ');
     throw HttpError.conflict(`In use by ${where}. Remove it there first.`, 'MEDIA_IN_USE', {
       projects: refs,
       settings: settingsRefs,

@@ -46,6 +46,12 @@ export const ADMIN_ROUTES: Routes = [
             loadComponent: () => import('./home/home-settings.component').then((c) => c.HomeSettingsComponent),
           },
           {
+            path: 'site',
+            title: 'Site settings | Admin',
+            canDeactivate: [unsavedChangesGuard],
+            loadComponent: () => import('./site/site-settings.component').then((c) => c.SiteSettingsComponent),
+          },
+          {
             path: 'featured',
             title: 'Landing tiles | Admin',
             loadComponent: () => import('./featured/featured.component').then((c) => c.FeaturedComponent),

@@ -65,13 +65,13 @@ Public routes are lazy children of `PagesComponent` (`<app-header>` + outlet).
     - `media` + `split`: `.doubleImage` when both items are images; `.doubleVideo` with `.videoChild` for two videos or a mixed pair
     - `text`: `.textBlock`
   - Below-the-fold videos use [AutoplayInViewDirective](src/app/shared/autoplay-in-view.directive.ts), which plays them only while visible. Images are `loading="lazy"`.
-- **Details page chrome** (contact CTA "Let's Talk" → WhatsApp, previous/next preview): [pages/project-details/](src/app/pages/project-details/). Prev/next comes from the API, ordered by the admin order, and wraps around.
+- **Details page chrome** (call-to-action heading, lines and button are dynamic via admin → Site settings; previous/next preview): [pages/project-details/](src/app/pages/project-details/). Prev/next comes from the API, ordered by the admin order, and wraps around.
 - **Header / nav / contact panel / social buttons / service marquee**: [core/header/](src/app/core/header/).
   - Nav labels and paths are the `items` and `paths` arrays in `header.component.ts`: Home, Work, Contact.
   - "Contact" calls `openContact()`, which expands the panel (navigating home first if needed).
   - The client-logo strip was removed from the panel; the expanded height (`.grow.active`) is 350px.
-  - Contact icons: Email (mailto), WhatsApp, Instagram, LinkedIn. URLs live in [core/contact.ts](src/app/core/contact.ts) (`CONTACT`), shared with the details page "Let's Talk" button. LinkedIn is an inline SVG (`.btn2--svg`) styled like the PNGs: 20% white disc, 60% white glyph, 100% on hover.
-  - Facebook and Google Maps buttons are hidden. To restore, re-add buttons with the ImageKit icons `.../assets/header/socials/Facebook.png` / `hoveredFacebook.png` and `location.png` / `hoveredLocation.png` (Maps link: `https://www.google.com/maps/place/Warc+Limited/@23.7888658,90.4020894,21z`).
+  - **Logo, contact heading/text and links are dynamic** (admin → Site settings). Platforms and their icons are defined in `CONTACT_PLATFORMS` in [site.service.ts](src/app/core/services/site.service.ts): PNG pairs for email, WhatsApp, Instagram, Facebook and location; LinkedIn is an inline SVG (`.btn2--svg`); `custom` uses an uploaded icon (`.btn2--custom`). `linkHref()` turns a bare email into `mailto:` and a bare phone number into `wa.me`. LinkedIn is an inline SVG (`.btn2--svg`) styled like the PNGs: 20% white disc, 60% white glyph, 100% on hover.
+  - Facebook and Location are available as platforms; add them in the admin. Old Maps link: `https://www.google.com/maps/place/Warc+Limited/@23.7888658,90.4020894,21z`.
   - Social `href`s are empty.
 - **Landing page**: [landingpage.component.html](src/app/pages/home/landingpage/landingpage.component.html).
   - The hero comes from `GET /api/v1/settings` via [SiteService](src/app/core/services/site.service.ts) (falls back to `FALLBACK_HOME_HERO`).
@@ -83,7 +83,93 @@ Public routes are lazy children of `PagesComponent` (`<app-header>` + outlet).
 - **About/Team page**: [team-page.component.html](src/app/pages/team-page/team-page.component.html), still hard-coded.
   - Each member is a `<swiper-slide>` preceded by a `<!-- Name -->` comment.
   - Photos are in `src/assets/images/TeamsPage/teamMembers/`.
-- **Page title / favicon**: [src/index.html](src/index.html) (title "Fayek Al Rafi"; keep in sync with `environment.siteTitle`), `src/favicon.ico`.
+- **Settings data:** [SiteService](src/app/core/services/site.service.ts) exposes `settings# portfolio-fayek
+
+Angular 17 portfolio site: standalone components, SSR via `@angular/ssr` with an Express server, originally the WARC Ltd. agency site.
+
+- **Project content comes from the API in `../api`** (see `../api/CLAUDE.md`). The old `project_data.json` now lives only in `api/seed/`.
+- The admin panel for managing projects is part of this app, at `/admin`.
+
+## Commands
+- `npm start` / `npm run dev`: `ng serve` at http://localhost:4200.
+  - Needs the API running on `localhost:5000`. [proxy.conf.mjs](proxy.conf.mjs) forwards `/api` to `API_INTERNAL_URL` from `.env`.
+  - **Restart ng serve after editing `angular.json`, `proxy.conf.mjs` or `.env`.**
+- `npm run build`: production build to `dist/build/{browser,server}`. Prerender is **off**: pages are dynamic and SSR'd at runtime.
+- `npm run serve:ssr:portfolio-fayek`: runs `dist/build/server/server.mjs` (port `PORT`, default 4000).
+  - The bundle includes its dependencies, so no `node_modules` is needed at runtime.
+- `npm test`: Karma/Jasmine (boilerplate only).
+- The Angular project name is `portfolio-fayek`.
+
+## Configuration
+**Build-time** (baked into the bundle; rebuild after changing):
+- [src/environments/environment.ts](src/environments/environment.ts) is used for production builds.
+- [environment.development.ts](src/environments/environment.development.ts) is used by `ng serve` and development builds, via `fileReplacements`.
+
+| Field | Purpose |
+|---|---|
+| `apiUrl` | API base URL used by the browser. Default `/api/v1` (same-origin through the proxy). An absolute URL calls the API cross-origin; then the API's `CORS_ORIGINS` must allow the site. |
+| `ssrApiOrigin` | Fallback API origin for SSR when `API_INTERNAL_URL` is unset |
+| `siteTitle` | Page title suffix |
+
+**Runtime**: `ui/.env` (git-ignored; template in [.env.example](.env.example)). It is read by `serve:ssr` (`node --env-file-if-exists=.env`) and by [proxy.conf.mjs](proxy.conf.mjs) (the ng serve proxy). In Docker or Dokploy, set container env vars instead.
+
+| Var | Default | Purpose |
+|---|---|---|
+| `PORT` | 4000 | SSR server port |
+| `API_INTERNAL_URL` | `http://localhost:5000` | API origin used by SSR data fetches **and** the `/api` proxy (prod and dev), e.g. `http://api:5000` in Docker |
+| `SSR_CACHE_TTL` | 60 | Seconds to cache rendered public HTML in memory (0 = off) |
+
+## Data flow
+- Every call uses a relative `/api/v1/...` URL ([core/api/api.config.ts](src/app/core/api/api.config.ts)).
+  - In the browser, [server.ts](server.ts) proxies `/api` to the API in production, and `proxy.conf.mjs` does it in dev. This keeps calls same-origin, so there's no CORS and the refresh cookie is first-party.
+  - On the server, `apiBaseInterceptor` prefixes `API_ORIGIN`, which is provided in [app.config.server.ts](src/app/app.config.server.ts) from `API_INTERNAL_URL`.
+- `provideClientHydration()` transfers SSR GET responses to the browser, so pages don't re-fetch after hydrating.
+- Public data goes through [core/services/project.service.ts](src/app/core/services/project.service.ts): `list()`, `featured()`, `bySlug()`.
+- Types: [core/models/project.ts](src/app/core/models/project.ts), which mirrors the API.
+
+## Routes ([src/app/app.routes.ts](src/app/app.routes.ts))
+| Path | Component | Notes |
+|---|---|---|
+| `admin/**` | lazy `admin/admin.routes.ts` | Outside the public layout. See Admin below. |
+| `''` | HomeComponent → `<app-landingpage>` | Tiles from `GET /projects/featured` |
+| `works` | AllProjectsComponent | Grid from `GET /projects` |
+| `works/:slug` | ProjectDetailsComponent | `projectResolver` loads the data before render. Numeric `:slug` (old `/works/:idx` links) redirects to the slug; unknown slugs go to `/works`. Sets title and meta from `seo`. |
+| `**` | redirect to `''` | |
+
+Public routes are lazy children of `PagesComponent` (`<app-header>` + outlet).
+
+**About is hidden:** its route is removed, so `/about` falls through `**` to home, and it is gone from the header nav. `TeamPageComponent` is kept; to restore it, re-add the route in `app.routes.ts` and put `About` back in the header's `items`/`paths`.
+
+## Where to edit what
+- **Project content** (titles, client, involvement, results, media, block order, landing tiles, SEO): **use the admin panel**, not code.
+- **The case-study layout** (hero, info panel, blocks): [shared/project-view/](src/app/shared/project-view/).
+  - Used by both the public details page and the admin live preview.
+  - Its SCSS uses **container queries** (`@container pv (max-width: …)`) instead of media queries, so the preview frame can render true mobile and desktop layouts. Keep it that way.
+  - Block types:
+    - `media` + `full`: `.singleImage` for an image, `.bigVideo` for a video
+    - `media` + `split`: `.doubleImage` when both items are images; `.doubleVideo` with `.videoChild` for two videos or a mixed pair
+    - `text`: `.textBlock`
+  - Below-the-fold videos use [AutoplayInViewDirective](src/app/shared/autoplay-in-view.directive.ts), which plays them only while visible. Images are `loading="lazy"`.
+- **Details page chrome** (call-to-action heading, lines and button are dynamic via admin → Site settings; previous/next preview): [pages/project-details/](src/app/pages/project-details/). Prev/next comes from the API, ordered by the admin order, and wraps around.
+- **Header / nav / contact panel / social buttons / service marquee**: [core/header/](src/app/core/header/).
+  - Nav labels and paths are the `items` and `paths` arrays in `header.component.ts`: Home, Work, Contact.
+  - "Contact" calls `openContact()`, which expands the panel (navigating home first if needed).
+  - The client-logo strip was removed from the panel; the expanded height (`.grow.active`) is 350px.
+  - **Logo, contact heading/text and links are dynamic** (admin → Site settings). Platforms and their icons are defined in `CONTACT_PLATFORMS` in [site.service.ts](src/app/core/services/site.service.ts): PNG pairs for email, WhatsApp, Instagram, Facebook and location; LinkedIn is an inline SVG (`.btn2--svg`); `custom` uses an uploaded icon (`.btn2--custom`). `linkHref()` turns a bare email into `mailto:` and a bare phone number into `wa.me`. LinkedIn is an inline SVG (`.btn2--svg`) styled like the PNGs: 20% white disc, 60% white glyph, 100% on hover.
+  - Facebook and Location are available as platforms; add them in the admin. Old Maps link: `https://www.google.com/maps/place/Warc+Limited/@23.7888658,90.4020894,21z`.
+  - Social `href`s are empty.
+- **Landing page**: [landingpage.component.html](src/app/pages/home/landingpage/landingpage.component.html).
+  - The hero comes from `GET /api/v1/settings` via [SiteService](src/app/core/services/site.service.ts) (falls back to `FALLBACK_HOME_HERO`).
+    - Options: image, mobile image (`<picture>` source at ≤500px), video (replaces the image), poster, alt.
+    - The "Works" button's vertical position is set via the CSS variables `--hero-btn-top` / `--hero-btn-top-mobile` on `.HeroSection` (defaults 72% / 67% of the hero height).
+  - The tiles loop over the featured projects; a tile links only when `hasDetails`.
+  - The "Works" button links to `/works`.
+  - The old bottom brand section (`#footer`) was removed.
+- **About/Team page**: [team-page.component.html](src/app/pages/team-page/team-page.component.html), still hard-coded.
+  - Each member is a `<swiper-slide>` preceded by a `<!-- Name -->` comment.
+  - Photos are in `src/assets/images/TeamsPage/teamMembers/`.
+ (one shared request per app instance, transferred from SSR, falling back to `FALLBACK_SETTINGS` on error). It's used by the header, landing, project page and [BrandingService](src/app/core/services/branding.service.ts). BrandingService is started in `AppComponent` and swaps the `<link rel=icon|apple-touch-icon>` hrefs, on the server too, when a favicon is set.
+- **Page title / favicon**: [src/index.html](src/index.html) (title "Fayek Al Rafi"; keep in sync with `environment.siteTitle`). Icons: `src/favicon.ico` (16/32/48), `src/assets/icons/` (favicon-32, apple-touch-icon 180, icon-192/512) and `src/assets/site.webmanifest`. They are an "FR" monogram: Arial Bold F + Segoe UI R (Light at large sizes, Regular at small), white on a #111 rounded square.
 
 ## Admin panel (`src/app/admin/`)
 **How it loads:**
@@ -114,6 +200,10 @@ Public routes are lazy children of `PagesComponent` (`<app-header>` + outlet).
 - **[MediaFieldComponent](src/app/admin/projects/editor/media-field.component.ts)**: one media slot. It takes drag-drop, upload with progress, a library pick or a pasted URL, plus alt text and a video poster.
   - The upload path is [UploadService](src/app/admin/services/upload.service.ts): presign, then POST to S3 through `HttpBackend` (no interceptors), then confirm with the dimensions measured in the browser.
 - **Home page** (`/admin/home`): hero image, mobile image and video, plus the "Works" button position (desktop and mobile sliders), with a live preview.
+- **Site settings** (`/admin/site`), with previews:
+  - Branding: header logo and favicon.
+  - Contact panel: heading, text, and links (drag to reorder; platform, URL, label, custom icon).
+  - Project page CTA: heading, lines, button label and link.
 - **Landing tiles** (`/admin/featured`): order the tiles and add or remove them.
 - **Media library** (`/admin/media`): multi-file upload (3 at a time, drop anywhere), filter and search, alt text, copy URL, delete (blocked while in use).
 - **Account** (`/admin/account`): change password.
@@ -138,7 +228,9 @@ Public routes are lazy children of `PagesComponent` (`<app-header>` + outlet).
     - caches public HTML (`X-SSR-Cache: HIT`)
     - caches static assets (hashed bundles for 1y, immutable; `/assets` for 1 day)
   - Rendered public HTML is cached for `SSR_CACHE_TTL`, so admin edits can take up to that long (plus the API cache TTL) to appear.
-- **Angular 17 compiler gotcha:** don't use `??` inside an `@for ... track` expression. It compiles to an undeclared temp variable and the render fails with `ReferenceError: tmp_N_M is not defined`. Use `||` or a method instead.
+- **Angular 17 compiler gotchas:**
+  - In the header, `@for (... ; track $index)` failed to compile (NG9 "$index does not exist"). Track by the item instead.
+  - Don't use `??` inside an `@for ... track` expression. It compiles to an undeclared temp variable and the render fails with `ReferenceError: tmp_N_M is not defined`. Use `||` or a method instead.
 
 ## Assets
 - Legacy images and videos are on the ImageKit CDN (`https://ik.imagekit.io/uhvinpqxo/...`) or in `src/assets/images/<Project>/`. Seeded local paths are absolute `${PUBLIC_SITE_URL}/assets/...` URLs.

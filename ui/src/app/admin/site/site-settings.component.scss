@@ -1,0 +1,229 @@
+.cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 18px;
+  align-items: start;
+  @media (max-width: 1050px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* branding previews */
+.hdr {
+  height: 56px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.82);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  img {
+    height: 14px;
+    width: auto;
+    max-width: 160px;
+    object-fit: contain;
+  }
+}
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: max-content;
+  padding: 8px 14px;
+  border-radius: 8px 8px 0 0;
+  background: #dee1e6;
+  font-size: 12.5px;
+  img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+  }
+}
+
+/* contact links editor */
+.links {
+  display: grid;
+  gap: 8px;
+}
+.link {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: start;
+  padding: 10px;
+  border: 1px solid var(--a-border);
+  border-radius: 9px;
+  background: var(--a-surface);
+}
+.link__body {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.link__row {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr);
+  gap: 8px;
+  &:has(> :only-child) {
+    grid-template-columns: 1fr;
+  }
+  @media (max-width: 560px) {
+    grid-template-columns: 1fr;
+  }
+}
+.link__actions {
+  display: flex;
+  gap: 2px;
+}
+
+/* dark contact panel preview (mirrors the header's .growBody) */
+.panel {
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.82);
+  color: #fff;
+  padding: 26px 18px 30px;
+  text-align: center;
+  display: grid;
+  gap: 10px;
+  h3 {
+    font-family: NeueReg, system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 20px;
+  }
+  p {
+    color: #c7c7c7;
+    font-size: 12.5px;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+}
+.icons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 10px;
+  a {
+    display: inline-flex;
+  }
+}
+.ic {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  &--custom {
+    object-fit: cover;
+    opacity: 0.6;
+  }
+  &--li {
+    display: grid;
+    place-items: center;
+    background: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 700;
+    font-size: 15px;
+  }
+}
+
+/* CTA preview */
+.cta {
+  border-radius: 10px;
+  background: #f3f3f3;
+  padding: 24px 20px;
+  display: grid;
+  gap: 6px;
+  h4 {
+    font-size: 22px;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  h5 {
+    color: #858585;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .cta__btn {
+    margin-top: 14px;
+    width: max-content;
+    padding: 10px 22px;
+    border-radius: 999px;
+    background: #000;
+    color: #fff;
+    font-size: 13px;
+    text-decoration: none;
+  }
+}
+
+/* header ticker editor (chips) + preview */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 32px;
+  padding: 0 4px 0 10px;
+  border-radius: 999px;
+  background: var(--a-subtle);
+  border: 1px solid var(--a-border);
+  cursor: grab;
+}
+.chip__input {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  min-width: 3ch;
+  max-width: 30ch;
+  outline: none;
+}
+.chip__x {
+  border: 0;
+  background: transparent;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: var(--a-muted);
+  &:hover {
+    background: var(--a-border);
+    color: var(--a-text);
+  }
+}
+.chip-add {
+  width: 190px;
+  height: 32px;
+  border-radius: 999px;
+}
+.ticker {
+  height: 44px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.82);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+.ticker__track {
+  display: inline-block;
+  animation: adm-ticker 15s linear infinite;
+}
+.ticker__item {
+  display: inline-block;
+  padding: 0 16px;
+  color: #fff;
+  font-style: italic;
+  font-size: 13px;
+}
+@keyframes adm-ticker {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}

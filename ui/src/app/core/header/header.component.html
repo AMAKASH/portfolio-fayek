@@ -3,51 +3,27 @@
       <div class="grow" [ngClass]="{'active':footerShow}">
          <div class="titlePart">
            <div class="logo">
-            <a routerLink="/" aria-label="Fayek Al Rafi — home"> <img src="https://dkr8ufw2tu8er.cloudfront.net/fayek%20al%20rafi_logo.png" alt="Fayek Al Rafi" width="78" height="14"></a>
+            <a routerLink="/" aria-label="Home"> @if (settings(); as s) { <img [src]="s.branding.logo" alt="Fayek Al Rafi" height="14"> }</a>
            </div> 
 
            
 
 
 
+           <!-- Ticker texts: admin → Site settings → Header ticker. Rendered twice for a seamless loop. -->
+           @if (tickerItems().length) {
            <div class="marquee-container">
-            <div class="marquee">
-              <div class="marquee-content">
-                <div id="Web" class="nav-ticker">Web Devolopment
+            <div class="marquee" [style.animation-duration.s]="tickerSeconds()">
+              @for (copy of [0, 1]; track copy) {
+                <div class="marquee-content" [attr.aria-hidden]="copy === 1 ? 'true' : null">
+                  @for (item of tickerItems(); track item.id) {
+                    <div class="nav-ticker">{{ item.text }}</div>
+                  }
                 </div>
-                <div id="UI" class="nav-ticker">UI/UX 
-                </div>
-                <div id="SaaS" class="nav-ticker">SaaS
-                </div>
-                <div id="ERP" class="nav-ticker">ERP
-                </div>
-                <div id="AR/VR" class="nav-ticker">AR/VR
-                </div>
-                <div id="App" class="nav-ticker">App Devolopment
-                </div>
-                <div id="Robotics" class="nav-ticker">Robotics & Hardware 
-                </div>
-                
+              }
             </div>
-            <div class="marquee-content">
-              <div id="Web" class="nav-ticker">Web Devolopment 
-              </div>
-              <div id="UI" class="nav-ticker">UI/UX 
-              </div>
-              <div id="SaaS" class="nav-ticker">SaaS
-              </div>
-              <div id="ERP" class="nav-ticker">ERP
-              </div>
-              <div id="AR/VR" class="nav-ticker">AR/VR
-              </div>
-              <div id="App" class="nav-ticker">App Devolopment
-              </div>
-              <div id="Robotics" class="nav-ticker">Robotics & Hardware 
-              </div>
-              
-          </div>
-            </div>
-        </div>
+           </div>
+           }
          </div>
 
          <hr>
@@ -69,8 +45,8 @@
          <div class="growContacts">
           <div class="growBody">
             <div class="texts">
-              <h3>Interested? Let's Warc</h3>
-              <p>If you appreciate our work, then let's schedule a meeting and start working. We thrive on new challenges.</p>
+              @if (settings()?.contact?.heading) { <h3>{{ settings()!.contact.heading }}</h3> }
+              @if (settings()?.contact?.text) { <p>{{ settings()!.contact.text }}</p> }
             </div>
             <div class="form">
   
@@ -85,27 +61,42 @@
               </div> -->
               
 
-              <!-- Contact links. Facebook and Google Maps buttons are hidden; their markup/URLs are noted in ui/CLAUDE.md to restore. -->
-              <div class="socialsButtons" >
-                <a [href]="contact.email" aria-label="Email"><button class="btn2" tabindex="-1" (mouseover)="isHovered = 0" (mouseleave)="isHovered = -1"><img *ngIf="isHovered!=0" src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/socials/Email.png?updatedAt=1725351159609" alt=""> <img *ngIf="isHovered==0" src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/socials/hoveredemail.png?updatedAt=1725352918048" alt="" /></button></a>
-                <a [href]="contact.whatsapp" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><button class="btn2" tabindex="-1" (mouseover)="isHovered = 1" (mouseleave)="isHovered = -1"><img *ngIf="isHovered!=1" src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/socials/Whatsapp.png?updatedAt=1725351159598" alt=""> <img *ngIf="isHovered==1" src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/socials/hoveredwhatsapp.png?updatedAt=1725352917882" alt="" /></button></a>
-                <a [href]="contact.instagram" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><button class="btn2" tabindex="-1" (mouseover)="isHovered = 3" (mouseleave)="isHovered = -1"><img *ngIf="isHovered!=3" src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/socials/Instagram.png?updatedAt=1725351159355" alt=""><img *ngIf="isHovered==3" src="https://ik.imagekit.io/uhvinpqxo/New%20Warc%20Website/assets/header/socials/hoveredInsta.png?updatedAt=1725352920655" alt="" /></button></a>
-                <!-- LinkedIn: inline SVG drawn to match the PNG set (20% white disc, 60% white glyph, 100% on hover) -->
-                <a [href]="contact.linkedin" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><button class="btn2 btn2--svg" tabindex="-1">
-                  <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
-                    <defs>
-                      <mask id="li-cut">
-                        <rect x="10" y="10" width="20" height="20" rx="3" fill="#fff" />
-                        <circle cx="15" cy="15.2" r="1.6" fill="#000" />
-                        <rect x="13.6" y="17.6" width="2.8" height="8.4" fill="#000" />
-                        <rect x="18" y="17.6" width="2.7" height="8.4" fill="#000" />
-                        <path d="M20.7 20.6C20.7 18.6 22 17.4 23.8 17.4 25.7 17.4 26.6 18.7 26.6 21V26H23.9V21.4C23.9 20.4 23.5 19.8 22.7 19.8 21.8 19.8 20.7 20.4 20.7 21.5Z" fill="#000" />
-                      </mask>
-                    </defs>
-                    <circle cx="20" cy="20" r="20" class="disc" />
-                    <rect x="10" y="10" width="20" height="20" rx="3" class="glyph" mask="url(#li-cut)" />
-                  </svg>
-                </button></a>
+              <!-- Contact links: admin → Site settings → Contact panel (order, platform, URL). -->
+              <div class="socialsButtons">
+                @for (link of links(); track link; let i = $index) {
+                  <a [href]="href(link)" [attr.target]="inPlace(link) ? null : '_blank'" [attr.rel]="inPlace(link) ? null : 'noopener noreferrer'"
+                     [attr.aria-label]="label(link)" [title]="label(link)">
+                    @switch (link.type) {
+                      @case ('linkedin') {
+                        <!-- LinkedIn: inline SVG matching the PNG set (20% white disc, 60% white glyph, 100% on hover) -->
+                        <button class="btn2 btn2--svg" tabindex="-1">
+                          <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+                            <defs>
+                              <mask [attr.id]="'li-cut-' + i">
+                                <rect x="10" y="10" width="20" height="20" rx="3" fill="#fff" />
+                                <circle cx="15" cy="15.2" r="1.6" fill="#000" />
+                                <rect x="13.6" y="17.6" width="2.8" height="8.4" fill="#000" />
+                                <rect x="18" y="17.6" width="2.7" height="8.4" fill="#000" />
+                                <path d="M20.7 20.6C20.7 18.6 22 17.4 23.8 17.4 25.7 17.4 26.6 18.7 26.6 21V26H23.9V21.4C23.9 20.4 23.5 19.8 22.7 19.8 21.8 19.8 20.7 20.4 20.7 21.5Z" fill="#000" />
+                              </mask>
+                            </defs>
+                            <circle cx="20" cy="20" r="20" class="disc" />
+                            <rect x="10" y="10" width="20" height="20" rx="3" class="glyph" [attr.mask]="'url(#li-cut-' + i + ')'" />
+                          </svg>
+                        </button>
+                      }
+                      @case ('custom') {
+                        <!-- Custom: uploaded icon, dimmed like the others and full on hover -->
+                        <button class="btn2 btn2--custom" tabindex="-1"><img [src]="link.icon" alt="" /></button>
+                      }
+                      @default {
+                        <button class="btn2" tabindex="-1" (mouseover)="isHovered = i" (mouseleave)="isHovered = -1">
+                          <img [src]="isHovered === i ? platforms[link.type].hover : platforms[link.type].icon" alt="" />
+                        </button>
+                      }
+                    }
+                  </a>
+                }
               </div>
               
             </div>

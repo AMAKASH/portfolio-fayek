@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
+import { SiteService, linkHref, opensInPlace } from '../../core/services/site.service';
 import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
-import { CONTACT } from '../../core/contact';
 import { HeaderComponent } from '../../core/header/header.component';
 import { PublicProject } from '../../core/models/project';
 import { ProjectViewComponent } from '../../shared/project-view/project-view.component';
@@ -18,7 +19,15 @@ import { ProjectViewComponent } from '../../shared/project-view/project-view.com
 })
 export class ProjectDetailsComponent {
   readonly project = signal<PublicProject | null>(null);
-  readonly contact = CONTACT;
+  /** Bottom call-to-action, edited in admin → Site settings. null until loaded (SSR waits for it). */
+  readonly cta = toSignal(inject(SiteService).settings$.pipe(map((s) => s.projectCta)), { initialValue: null });
+
+  ctaHref(url: string): string {
+    return linkHref('auto', url);
+  }
+  ctaInPlace(url: string): boolean {
+    return opensInPlace(this.ctaHref(url));
+  }
 
   private title = inject(Title);
   private meta = inject(Meta);

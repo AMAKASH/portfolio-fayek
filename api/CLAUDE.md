@@ -28,7 +28,7 @@ src/
     users/         User model (single admin)
     projects/      Project model, public + admin routers
     media/         presign / confirm / library / delete
-    settings/      single `Settings` doc (key 'site'): editable site content (home hero)
+    settings/      single `Settings` doc (key 'site'): home hero, branding, contact panel, project CTA
     health/        GET /health (pings Mongo; used by the Docker HEALTHCHECK)
 scripts/           seed-projects, create-admin, sync-indexes
 seed/              project_data.json (original UI JSON; it's inside the API so the Docker build context has it)
@@ -124,8 +124,10 @@ Express 5 forwards rejected promises to `errorHandler`, so controllers don't nee
 
 | Endpoint | Purpose |
 |---|---|
-| `GET /settings` | Public, cached. Returns `{homeHero:{image, mobileImage, video, poster, alt, buttonTopDesktop, buttonTopMobile}}`, with defaults if nothing has been saved. |
-| `GET/PUT /admin/settings` | Admin read and replace. Positions are 0–100 (%); defaults are 72 and 67. |
+| `GET /settings` | Public, cached. Returns `{homeHero, branding:{logo,favicon}, contact:{heading,text,links[{type,url,label,icon}]}, projectCta:{heading,lines[],buttonLabel,buttonUrl}}`. |
+| `GET/PUT /admin/settings` | Admin read and update. `PUT` is partial: only the sections sent are replaced. Hero positions are 0–100 (%). Custom links require `icon`. |
+
+Sections never saved fall back to the `DEFAULT_*` constants in [settings.model.ts](src/modules/settings/settings.model.ts). Saved values, including empty strings and empty lists, are respected.
 
 Media deletion also checks settings references.
 

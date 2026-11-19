@@ -18,7 +18,7 @@ export class LandingpageComponent {
 
   /** Hero image/video, edited in the admin (/admin/home). null until loaded (SSR waits for it). */
   readonly hero = toSignal(
-    inject(SiteService).settings().pipe(
+    inject(SiteService).settings$.pipe(
       map((s) => s.homeHero),
       catchError(() => of(FALLBACK_HOME_HERO)),
     ),

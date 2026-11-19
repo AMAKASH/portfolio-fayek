@@ -176,6 +176,7 @@ export class AdminLayoutComponent {
     { path: '/admin/home', label: 'Home page', icon: 'image' },
     { path: '/admin/featured', label: 'Landing tiles', icon: 'star' },
     { path: '/admin/media', label: 'Media library', icon: 'library' },
+    { path: '/admin/site', label: 'Site settings', icon: 'link' },
     { path: '/admin/account', label: 'Account', icon: 'user' },
   ];
 
