@@ -65,7 +65,6 @@ export interface FeaturedTile {
   slug: string;
   title: string;
   image: string;
-  hasDetails: boolean;
 }
 
 export interface Neighbour {

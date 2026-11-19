@@ -34,7 +34,6 @@ import { IconComponent } from '../shared/icon.component';
                 <strong class="truncate">{{ p.featuredLabel || p.title }}</strong>
                 <span class="small muted row">
                   @if (p.status !== 'published') { <span class="pill pill--draft">Draft: hidden</span> }
-                  @if (!p.blockCount) { <span>No case study: tile isn't clickable</span> }
                   @if (!p.listed) { <span>Not in works grid</span> }
                 </span>
               </div>

@@ -103,7 +103,6 @@ export function listFeatured() {
       featuredLabel: string;
       featuredImage: string;
       thumbnail: string;
-      blockCount: number;
     }>([
       { $match: { ...PUBLISHED, featured: true } },
       { $sort: { featuredOrder: 1, _id: 1 } },
@@ -115,7 +114,6 @@ export function listFeatured() {
           featuredLabel: 1,
           featuredImage: 1,
           thumbnail: 1,
-          blockCount: { $size: { $ifNull: ['$blocks', []] } },
         },
       },
     ]);
@@ -123,8 +121,6 @@ export function listFeatured() {
       slug: r.slug,
       title: r.featuredLabel || r.title,
       image: r.featuredImage || r.thumbnail || '',
-      /** false → the tile has no case study yet, so the UI shouldn't link it */
-      hasDetails: r.blockCount > 0,
     }));
   });
 }

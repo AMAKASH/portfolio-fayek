@@ -183,7 +183,7 @@ Media deletion also checks settings references.
 - URLs are kept as they are, with two fixes:
   - Concatenated double URLs are cut at `../`.
   - Local `../../../assets/...` paths become `${PUBLIC_SITE_URL}/assets/...`.
-- It also creates the landing tiles that existed only in HTML (Bsmart by Bkash, LifeInRamadan, BridgingBinaries, Coupon). They are `featured`, `listed:false` and have no blocks yet, so their tiles aren't clickable.
+- It also creates the landing tiles that existed only in HTML (Bsmart by Bkash, LifeInRamadan, BridgingBinaries, Coupon). They are `featured`, `listed:false` and have no blocks yet (their tiles still link to /works/:slug).
 
 ## Docker / Dokploy
 - `Dockerfile`: a multi-stage `node:22-alpine` build that runs as non-root `node`, with a `HEALTHCHECK` on `/health`, on port 5000.
